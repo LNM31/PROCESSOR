@@ -1,24 +1,24 @@
 module fac(
-    input x,y,ci,
-    output z,co
+    input x, y, ci,
+    output z, co
 );
-    assign z=x^y^ci;
-    assign co=(x&y)|(x&ci)|(y&ci);
+    assign z = x ^ y ^ ci;
+    assign co = (x & y) | (x & ci) | (y & ci);
 endmodule
 
 module RCA(
-    input [8:0]x,y,
+    input [16:0] x, y,
     input ci,
-    output [8:0]z,
+    output [16:0] z,
     output co,
     output overflow
 );
-    wire [7:0]w_co;
+    wire [15:0]w_co;
     genvar i;
     generate
-        for(i=0;i<9;i=i+1)
+        for(i = 0; i < 17; i = i + 1)
         begin
-            if(i==0)
+            if(i == 0)
             fac f(
                 .x(x[0]),
                 .y(y[0]),
@@ -26,12 +26,12 @@ module RCA(
                 .z(z[0]),
                 .co(w_co[0])
             );
-            else if(i==8)
+            else if(i == 16)
             fac f(
-                .x(x[8]),
-                .y(y[8]),
-                .ci(w_co[7]),
-                .z(z[8]),
+                .x(x[16]),
+                .y(y[16]),
+                .ci(w_co[15]),
+                .z(z[16]),
                 .co(co)
             );
             else
@@ -45,5 +45,5 @@ module RCA(
         end
     endgenerate
 
-    assign overflow=w_co[7] ^ w_co[6];
+    assign overflow = w_co[15] ^ w_co[14];
 endmodule

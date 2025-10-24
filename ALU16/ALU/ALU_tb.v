@@ -3,8 +3,8 @@
 module ALU_tb;
     reg clk,rst_b,start;
     reg[1:0]s;
-    reg [7:0]inbus;
-    wire[7:0]outbus;
+    reg [15:0]inbus;
+    wire[15:0]outbus;
     wire finish;
     wire overflow;
 
@@ -43,9 +43,9 @@ module ALU_tb;
         #20; rst_b=1; 
         #20; s=2'b00; 
         #40; start=1; 
-        #50; inbus=8'b00111001; //140 inbus=8'b00111001;//M 57
+        #50; inbus=16'b0000100001100011; //140 inbus=8'b00111001;//M 2147
         #30; start=0; 
-        #60; inbus=8'b01000011;  //230 inbus=8'b01010110; //Q 67
+        #60; inbus=16'b0000000000000101;  //230 inbus=8'b01010110; //Q 5
     end
 
     initial begin // scadere
@@ -54,9 +54,9 @@ module ALU_tb;
         #20; rst_b=1; 
         #20; s=2'b01; 
         #40; start=1; 
-        #50; inbus=8'b00111001; //140 inbus=8'b00111001;//M 57
+        #50; inbus=16'b0000000000000101; //140 inbus=8'b00111001;//M 2147 
         #30; start=0; 
-        #60; inbus=8'b01000011;  //230 inbus=8'b01010110; //Q 67
+        #60; inbus=16'b0000100001100011;  //230 inbus=8'b01010110; //Q 5
     end
 
     initial begin // adunare cu overflow
@@ -65,9 +65,9 @@ module ALU_tb;
         #20; rst_b=1;
         #20; s=2'b00;
         #40; start=1;
-        #50; inbus=8'b01111111; //M=127 test overflow adunare 127 + 126 = -3 in c2
+        #50; inbus=16'd16389; //M=127 test overflow adunare 127 + 126 = -3 in c2
         #30; start=0;
-        #60; inbus=8'b01111110; //Q=126 test overflow adunare 127 + 126 = -3 in c2
+        #60; inbus=16'd16386; //Q=126 test overflow adunare 127 + 126 = -3 in c2
     end
 
     initial begin // scadere cu overflow
@@ -76,9 +76,9 @@ module ALU_tb;
         #20; rst_b=1;
         #20; s=2'b01;
         #40; start=1;
-        #50; inbus=8'b00000001; //M=1 test overflow scadere -128 - 1 = 127 in c2
+        #50; inbus=16'b0000000000000001; //M=1 test overflow scadere -128 - 1 = 127 in c2
         #30; start=0;
-        #60; inbus=8'b10000000; //Q=-128 test overflow scadere -128 -1 = 127 in c2
+        #60; inbus=16'b1000000000000000; //Q=-128 test overflow scadere -128 -1 = 127 in c2
     end
 
     initial begin // inmultire
@@ -87,57 +87,57 @@ module ALU_tb;
         #20; rst_b=1;
         #20; s=2'b10;
         #40; start=1;
-        #50; inbus=8'b10100011;//M -93 inmultire
+        #50; inbus=16'b0000100001100011;//M -93 inmultire
         #30; start=0;
-        #60; inbus=8'b10001101;//Q -115 inmultire
+        #60; inbus=16'b0000000000000101;//Q -115 inmultire
         //00101001     11000111
     end
 
     initial begin // inmultire
-        #6500;
+        #12500;
         #10; rst_b=0;
         #20; rst_b=1;
         #20; s=2'b10;
         #40; start=1;
-        #50; inbus=8'b01011001;//M 89 inmultire 
+        #50; inbus=16'b0000100001101011;//M -93 inmultire
         #30; start=0;
-        #60; inbus=8'b10011111;//Q -97 inmultire 
+        #60; inbus=16'b0000000000001101;//Q -115 inmultire 
         //11011110    01000111
     end
 
     initial begin // inmultire
-        #9800;
+        #22800;
         #10; rst_b=0;
         #20; rst_b=1;
         #20; s=2'b10;
         #40; start=1;
-        #50; inbus=8'b10100001;//M -119 inmultire  
+        #50; inbus=16'd2350;//M -93 inmultire
         #30; start=0;
-        #60; inbus=8'b10001001;//Q -95 inmultire 
+        #60; inbus=16'd159;//Q -115 inmultire
         //00101100     00101001
     end
 
     initial begin // impartire
-        #13300;
+        #33300;
         #10; rst_b=0;
         #20; rst_b=1;
         #20; s=2'b11;
         #40; start=1;
-        #50; inbus=8'b00001101;//M 13 impartire  
+        #50; inbus=16'b0000000000000101;//Q -115 inmultire
         #30; start=0;
-        #60; inbus=8'b11011001;//Q 217 impartire 
+        #60; inbus=16'b0000100001100011;//M -93 inmultire
         //9     16
     end
 
     initial begin // impartire
-        #17200;
+        #43200;
         #10; rst_b=0;
         #20; rst_b=1;
         #20; s=2'b11;
         #40; start=1;
-        #50; inbus=8'b00001100;//M 12 impartire 
+        #50; inbus=16'd145;//M -93 inmultire
         #30; start=0;
-        #60; inbus=8'b11110111;//Q 247 impartire 
+        #60; inbus=16'd18921;//Q -115 inmultire
         //7     20
     end
 
