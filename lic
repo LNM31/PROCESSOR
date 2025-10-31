@@ -1,0 +1,29 @@
+#! /usr/bin/vvp
+:ivl_version "12.0 (stable)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision + 0;
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/system.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/vhdl_sys.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/vhdl_textio.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/v2005_math.vpi";
+:vpi_module "/usr/lib/x86_64-linux-gnu/ivl/va_math.vpi";
+S_0x57110f090590 .scope module, "tb" "tb" 2 1;
+ .timescale 0 0;
+v0x57110f090720_0 .var "input_data", 15 0;
+v0x57110f0d89d0_0 .var/i "result", 31 0;
+    .scope S_0x57110f090590;
+T_0 ;
+    %vpi_call 2 7 "$write", "Introdu valoarea: " {0 0 0};
+    %vpi_call 2 8 "$fflush" {0 0 0};
+    %vpi_func 2 9 "$fscanf" 32, 32'b10000000000000000000000000000000, "%d", v0x57110f090720_0 {0 0 0};
+    %store/vec4 v0x57110f0d89d0_0, 0, 32;
+    %vpi_call 2 10 "$display", "Ai introdus: %d (0x%h)", v0x57110f090720_0, v0x57110f090720_0 {0 0 0};
+    %vpi_call 2 11 "$display", "fscanf returnat: %d", v0x57110f0d89d0_0 {0 0 0};
+    %vpi_call 2 12 "$finish" {0 0 0};
+    %end;
+    .thread T_0;
+# The file index is used to find the file name in the following table.
+:file_names 3;
+    "N/A";
+    "<interactive>";
+    "ex.v";

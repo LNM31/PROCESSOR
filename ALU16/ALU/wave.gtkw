@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Fri Oct 24 11:31:01 2025
+[*] Wed Oct 29 21:51:44 2025
 [*]
 [dumpfile] "/home/lica/PROCESSOR/ALU16/ALU/dump.vcd"
-[dumpfile_mtime] "Fri Oct 24 11:29:53 2025"
+[dumpfile_mtime] "Wed Oct 29 21:51:10 2025"
 [dumpfile_size] 254059
 [savefile] "/home/lica/PROCESSOR/ALU16/ALU/wave.gtkw"
-[timestart] 14478000
+[timestart] 183000
 [size] 1144 690
 [pos] -1 -1
-*-17.700001 15130000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.700001 376000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] ALU_tb.
 [treeopen] ALU_tb.alu.
 [sst_width] 297
@@ -27,7 +27,6 @@ ALU_tb.alu.negative
 ALU_tb.alu.zero
 [color] 1
 ALU_tb.alu.carry
-@29
 [color] 1
 ALU_tb.overflow
 @24
@@ -44,8 +43,6 @@ ALU_tb.alu.a_out[16:0]
 ALU_tb.alu.q_out[15:0]
 [color] 7
 ALU_tb.alu.m_out[15:0]
-@28
-ALU_tb.alu.CU.a_16
 @800022
 [color] 2
 ALU_tb.alu.c[10:0]
