@@ -1,5 +1,5 @@
 $date
-	Fri Oct 31 11:07:31 2025
+	Sat Nov  8 19:34:29 2025
 $end
 $version
 	Icarus Verilog
@@ -1013,38 +1013,9 @@ $upscope $end
 $upscope $end
 $upscope $end
 $upscope $end
-$scope module encoder $end
-$var wire 2 c& in [1:0] $end
-$var parameter 32 d& w $end
-$var reg 1 e& out $end
-$var integer 32 f& i [31:0] $end
-$upscope $end
-$scope module mux_1s $end
-$var wire 4 g& d0 [3:0] $end
-$var wire 4 h& d1 [3:0] $end
-$var wire 1 i& sel $end
-$var wire 4 j& o [3:0] $end
-$var parameter 32 k& w $end
-$upscope $end
-$scope module mux_3s $end
-$var wire 4 l& d0 [3:0] $end
-$var wire 4 m& d1 [3:0] $end
-$var wire 4 n& d2 [3:0] $end
-$var wire 4 o& d3 [3:0] $end
-$var wire 4 p& d4 [3:0] $end
-$var wire 4 q& d5 [3:0] $end
-$var wire 4 r& d6 [3:0] $end
-$var wire 4 s& d7 [3:0] $end
-$var wire 3 t& sel [2:0] $end
-$var wire 4 u& o [3:0] $end
-$var parameter 32 v& w $end
-$upscope $end
 $enddefinitions $end
 $comment Show the parameter values. $end
 $dumpall
-b100 v&
-b100 k&
-b1 d&
 b1 b&
 b1 ]&
 b1 V&
@@ -1099,23 +1070,6 @@ b0 Y
 $end
 #0
 $dumpvars
-bz u&
-bz t&
-bz s&
-bz r&
-bz q&
-bz p&
-bz o&
-bz n&
-bz m&
-bz l&
-bz j&
-zi&
-bz h&
-bz g&
-b11111111111111111111111111111111 f&
-0e&
-bz c&
 bx a&
 0`&
 0_&

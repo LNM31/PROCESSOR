@@ -1,9 +1,9 @@
-`include"../RCA/RCA.v"
+`include"../Combinational/RCA/RCA.v"
 `include"../Control_Unit/Control_Unit_Structural.v"
 `include"../Registers/A.v"
 `include"../Registers/Q.v"
 `include"../Registers/M.v"
-`include"../Registers/combinational.v"
+`include"../Combinational/muxes/mux_2s.v"
 `include"../Registers/ffd.v"
 `include"../Registers/counter.v"
 

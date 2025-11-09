@@ -144,5 +144,10 @@ module ALU_tb;
         //7     20
     end
 
+    initial begin
+        #43300;
+        $display("A:%b", alu.a_out | 16'd7);
+    end
+
 
 endmodule
