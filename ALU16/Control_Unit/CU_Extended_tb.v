@@ -83,9 +83,9 @@ module CU_Extended_tb;
     input [8*64:1] name
   );
     begin
-      if ((c === exp_c) && (finish === exp_finish))
-        $display("[%0t] PASS %-20s c=%b finish=%b", $time, name, c, finish);
-      else begin
+      if (!((c === exp_c) && (finish === exp_finish)))
+      begin
+        //$display("[%0t] PASS %-20s c=%b finish=%b", $time, name, c, finish);
         $error  ("[%0t] FAIL %-20s", $time, name);
         $display("        exp c=%b got c=%b | exp fin=%b got fin=%b", exp_c, c, exp_finish, finish);
       end
@@ -104,7 +104,6 @@ module CU_Extended_tb;
   initial begin
     $dumpfile("dump.vcd");
     $dumpvars(0, CU_Extended_tb);
-    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next c[18:0]            finish");
   end
 
   wire [4:0] state_bits     = {dut.f4.q, dut.f3.q, dut.f2.q, dut.f1.q, dut.f0.q};
@@ -121,20 +120,48 @@ module CU_Extended_tb;
     // Defaults
     s = 4'd0; start = 1'b0; q0 = 1'b0; q_1 = 1'b0; a_16 = 1'b0; cmp_cnt_m4 = 1'b0; cnt = 4'd0;
 
-    // Reset
-    do_reset(2);
-
     // ADD          sel   start q0    q_1   a_16  ccm4  cnt
-    drive_inputs(4'b0000, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
-    drive_inputs(4'b0000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
-    stepn(7);
+    $display("ADD:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+     
+    /* S0 */ drive_inputs(4'b0000, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step(); // S1
+    check_outputs(19'd1, 1'b0, "check c");
+    drive_inputs(4'b0000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step(); // S2
+    stepn(4);
     $display();
     
     // SUB          sel   start q0    q_1   a_16  ccm4  cnt
-    drive_inputs(4'b0001, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
-    drive_inputs(4'b0001, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
-    stepn(7);
+    $display("SUB:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+
+    /* S0 */ drive_inputs(4'b0001, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step(); // S1
+    drive_inputs(4'b0001, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step(); // S2
+    stepn(4);
     $display();
+
+    
+    $display("MUL:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b0010, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b0010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ step();
+    /* S9  */ drive_inputs(4'b0010, 1'b0, 1'b1, 1'b1, 1'b0, 1'b0, 4'd0); step();
+    /* S7  */ step();
+    /* S8  */ step();
+    /* S9  */ drive_inputs(4'b0010, 1'b0, 1'b1, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S5  */ drive_inputs(4'b0010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S7  */ step();
+    /* S8  */ step();
+    /* S9  */ drive_inputs(4'b0010, 1'b0, 1'b0, 1'b1, 1'b0, 1'b0, 4'd0); step();
+    /* S4  */ drive_inputs(4'b0010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S7  */ drive_inputs(4'b0010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd15); step();
+    /* S6  */ step();
+    /* S10 */ step();
+    /* S0  */ $display();
 
     stepn(3);
     $display("Testbench finished");

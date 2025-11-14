@@ -40,7 +40,7 @@ module Control_Unit(
         | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //13
         | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //26
         | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                   //29
-        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //32
+        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //32
         | ~qout[4] & ~qout[3] & qout[2] & qout[1] & qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0])                                           //39
         | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //40
         | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //45
@@ -57,6 +57,8 @@ module Control_Unit(
         | qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & ~qout[0]                                                                                //72
         | qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & qout[0]                                                                                 //73
         | qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0]                                                                                 //74
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //81
+
      ),
      .q(qout[3]));
 
@@ -95,6 +97,7 @@ module Control_Unit(
         | qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0]                                                                                  //78
         | qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0]                                                                                  //79
         | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & (q0~^q_1)                                                                     //80        
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //81
     ),
     .q(qout[2]));
 
@@ -119,7 +122,7 @@ module Control_Unit(
         | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //25
         | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //27
         | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //28
-        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //32
+        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //32
         | ~qout[4] & ~qout[3] & qout[2] & qout[1] & qout[0] & cnt[3] & cnt[2] & cnt[1] & cnt[0]                                              //38
         | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //45
         | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //46
@@ -194,7 +197,8 @@ module Control_Unit(
     assign c[11]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //8
                     | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4;                                   //46
     assign c[10]  =   ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //26
-                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & s[0];                                                  //29
+                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                   //29 
+                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0];                                                //81                                                  
     assign c[9]   =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //5
                     | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //6
                     | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0]);                                         //67
@@ -202,7 +206,7 @@ module Control_Unit(
                     | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //9
                     | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & cmp_cnt_m4                                      //11
                     | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //13
-                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //32
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //32
                     | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                  //33
                     | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //45
                     | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //47
@@ -247,7 +251,7 @@ module Control_Unit(
                     | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0];                                     //64
     assign c[2]   =   ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1]                                                                   //3
                     | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & s[0];                                                  //19 
-    assign c[1]   =   ~qout[4] & ~qout[2] & ~qout[1] & qout[0];                                                                                          //2
+    assign c[1]   =   ~qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & qout[0];                                                                                          //2
     assign c[0]   =   ~qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & start;                                                                                 //1
     assign finish =   ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                    //30
                     | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1]                                                         //31
