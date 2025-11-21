@@ -110,7 +110,7 @@ module CU_Extended_tb;
   wire [4:0] next_state_bits= {dut.f4.d, dut.f3.d, dut.f2.d, dut.f1.d, dut.f0.d};
 
   initial begin
-    $monitor("%7t  %b  %4b   %b    %b  %b   %b    %b  %2d %3d | %3d     %019b   %b",
+    $monitor("%8t  %b  %4b   %b    %b  %b   %b    %b  %2d %3d | %3d     %019b   %b",
              $time, rst_b, s, start, q0, q_1, a_16, cmp_cnt_m4, cnt,
              state_bits, next_state_bits, c, finish);
   end
@@ -162,6 +162,175 @@ module CU_Extended_tb;
     /* S6  */ drive_inputs(4'b0010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
     /* S10 */ step();
     /* S0  */ step();
+    $display();
+
+    $display("DIV:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b0011, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ step();
+    /* S11 */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b1, 1'b0, 4'd0); step();
+    /* S4  */ step();
+    /* S12 */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd5); step();
+    /* S13 */ drive_inputs(4'b0011, 1'b0, 1'b1, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S8  */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S5  */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S12 */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b1, 1'b0, 4'd15); step();
+    /* S14 */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S10 */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b0011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+    
+    $display("MOD:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b0100, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ step();
+    /* S11 */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b1, 1'b0, 4'd0); step();
+    /* S4  */ step();
+    /* S12 */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd5); step();
+    /* S13 */ drive_inputs(4'b0100, 1'b0, 1'b1, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S8  */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S5  */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S12 */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b1, 1'b0, 4'd15); step();
+    /* S14 */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S6  */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b0100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+    
+    $display("LSR:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b0101, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S15 */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S8  */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S15 */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd5); step();
+    /* S8  */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b1, 4'd0); step();
+    /* S10 */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b0101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+    
+    $display("LSL:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b0110, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S16 */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S8  */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S16 */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd5); step();
+    /* S8  */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b1, 4'd0); step();
+    /* S10 */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b0110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+    
+    $display("RSR:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b0111, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S17 */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S8  */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S17 */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd5); step();
+    /* S8  */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b1, 4'd0); step();
+    /* S10 */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b0111, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+    
+    $display("RSL:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b1000, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S18 */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S8  */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S18 */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd5); step();
+    /* S8  */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b1, 4'd0); step();
+    /* S10 */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b1000, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+    
+    $display("AND:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b1001, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b1001, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b1001, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S19 */ drive_inputs(4'b1001, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S6  */ drive_inputs(4'b1001, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b1001, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+    
+    $display("OR:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b1010, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b1010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b1010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S20 */ drive_inputs(4'b1010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S6  */ drive_inputs(4'b1010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b1010, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+
+    $display("XOR:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b1011, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b1011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b1011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S21 */ drive_inputs(4'b1011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S6  */ drive_inputs(4'b1011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b1011, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+
+    $display("NOT:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b1100, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b1100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b1100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S22 */ drive_inputs(4'b1100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S6  */ drive_inputs(4'b1100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b1100, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+
+    $display("CMP:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b1101, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b1101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b1101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S3  */ drive_inputs(4'b1101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S5  */ drive_inputs(4'b1101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b1101, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    $display();
+
+    $display("TST:");
+    $display("Time    rst sel  start q0 q_1 a_16 cmp cnt st | st_next       c[18:0]      finish");
+    do_reset(2);
+    //                        sel   start   q0    q_1   a_16 ccm4  cnt
+    /* S0  */ drive_inputs(4'b1110, 1'b1, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S1  */ drive_inputs(4'b1110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S2  */ drive_inputs(4'b1110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S19 */ drive_inputs(4'b1110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
+    /* S0  */ drive_inputs(4'b1110, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 4'd0); step();
     $display();
 
     stepn(3);

@@ -1,10 +1,10 @@
 `timescale 1ns/1ps
 `include "ALU.v"
 module ALU_tb;
-    reg clk,rst_b,start;
-    reg[1:0]s;
-    reg [15:0]inbus;
-    wire[15:0]outbus;
+    reg clk, rst_b, start;
+    reg [3:0] s;
+    reg [15:0] inbus;
+    wire[15:0] outbus;
     wire finish;
     wire negative, zero, carry, overflow;
 
@@ -44,7 +44,7 @@ module ALU_tb;
     initial begin // adunare
         #10; rst_b=0; 
         #20; rst_b=1; 
-        #20; s=2'b00; 
+        #20; s=4'b0000; 
         #40; start=1; 
         #50; inbus=16'b0000100001100011; //140 inbus=8'b00111001;//M 2147
         #30; start=0; 
@@ -55,7 +55,7 @@ module ALU_tb;
         #800;
         #10; rst_b=0; 
         #20; rst_b=1; 
-        #20; s=2'b01; 
+        #20; s=4'b0001; 
         #40; start=1; 
         #50; inbus=16'b0000000000000101; //140 inbus=8'b00111001;//M 2147 
         #30; start=0; 
@@ -66,7 +66,7 @@ module ALU_tb;
         #1500;
         #10; rst_b=0;
         #20; rst_b=1;
-        #20; s=2'b00;
+        #20; s=4'b0000;
         #40; start=1;
         #50; inbus=16'd16389; //M=127 test overflow adunare 127 + 126 = -3 in c2
         #30; start=0;
@@ -77,7 +77,7 @@ module ALU_tb;
         #2300;
         #10; rst_b=0;
         #20; rst_b=1;
-        #20; s=2'b01;
+        #20; s=4'b0001;
         #40; start=1;
         #50; inbus=16'b0000000000000001; //M=1 test overflow scadere -128 - 1 = 127 in c2
         #30; start=0;
@@ -88,7 +88,7 @@ module ALU_tb;
         #3100;
         #10; rst_b=0;
         #20; rst_b=1;
-        #20; s=2'b10;
+        #20; s=4'b0010;
         #40; start=1;
         #50; inbus=16'b0000100001100011;//M -93 inmultire
         #30; start=0;
@@ -100,7 +100,7 @@ module ALU_tb;
         #12500;
         #10; rst_b=0;
         #20; rst_b=1;
-        #20; s=2'b10;
+        #20; s=4'b0010;
         #40; start=1;
         #50; inbus=16'b0000100001101011;//M -93 inmultire
         #30; start=0;
@@ -112,7 +112,7 @@ module ALU_tb;
         #22800;
         #10; rst_b=0;
         #20; rst_b=1;
-        #20; s=2'b10;
+        #20; s=4'b0010;
         #40; start=1;
         #50; inbus=16'd2350;//M -93 inmultire
         #30; start=0;
@@ -124,7 +124,7 @@ module ALU_tb;
         #33300;
         #10; rst_b=0;
         #20; rst_b=1;
-        #20; s=2'b11;
+        #20; s=4'b0011;
         #40; start=1;
         #50; inbus=16'b0000000000000101;//Q -115 inmultire
         #30; start=0;
@@ -136,7 +136,7 @@ module ALU_tb;
         #43200;
         #10; rst_b=0;
         #20; rst_b=1;
-        #20; s=2'b11;
+        #20; s=4'b0011;
         #40; start=1;
         #50; inbus=16'd145;//M -93 inmultire
         #30; start=0;

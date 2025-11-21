@@ -1,4 +1,4 @@
-`include "ffd.v"
+//`include "ffd.v"
 module Control_Unit(
   input clk, rst_b,
   input [3:0] s,
