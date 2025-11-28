@@ -1,12 +1,12 @@
-`include"../Combinational/RCA/RCA.v"
-`include"../Control_Unit/CU_Extended2.v"
-`include"../Registers/A.v"
-`include"../Registers/Q.v"
-`include"../Registers/M.v"
-`include"../Combinational/muxes/mux_2s.v"
-`include"../Combinational/muxes/mux_3s.v"
-`include"../Registers/ffd.v"
-`include"../Registers/counter.v"
+// `include"../Combinational/RCA/RCA.v"
+// `include"../Control_Unit/CU_Extended2.v"
+// `include"../Registers/A.v"
+// `include"../Registers/Q.v"
+// `include"../Registers/M.v"
+// `include"../Combinational/muxes/mux_2s.v"
+// `include"../Combinational/muxes/mux_3s.v"
+// `include"../Registers/ffd.v"
+// `include"../Registers/counter.v"
 
 module ALU (
     input clk, rst_b, start,

@@ -1,0 +1,10 @@
+/home/lica/PROCESSOR/ALU16/Combinational/RCA/RCA.v
+/home/lica/PROCESSOR/ALU16/Combinational/muxes/mux_2s.v
+/home/lica/PROCESSOR/ALU16/Combinational/muxes/mux_3s.v
+/home/lica/PROCESSOR/ALU16/Registers/ffd.v
+/home/lica/PROCESSOR/ALU16/Registers/A.v
+/home/lica/PROCESSOR/ALU16/Registers/Q.v
+/home/lica/PROCESSOR/ALU16/Registers/M.v
+/home/lica/PROCESSOR/ALU16/Registers/counter.v
+/home/lica/PROCESSOR/ALU16/Control_Unit/CU_Extended2.v
+/home/lica/PROCESSOR/ALU16/ALU/ALU.v

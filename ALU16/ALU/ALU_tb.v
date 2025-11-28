@@ -24,7 +24,7 @@ module ALU_tb;
 
     initial begin
         $dumpfile("dump.vcd");
-        $dumpvars;
+        $dumpvars(0, ALU_tb);
         clk=0;
         rst_b=1;
         start=0;
