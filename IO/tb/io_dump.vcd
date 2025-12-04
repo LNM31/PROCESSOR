@@ -1,0 +1,310 @@
+$date
+	Thu Dec  4 16:35:26 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ns
+$end
+$scope module io_tb $end
+$var wire 1 ! out_ack $end
+$var wire 16 " inp_data [15:0] $end
+$var wire 1 # inp_ack $end
+$var reg 1 $ clk $end
+$var reg 1 % inp_req $end
+$var reg 16 & out_data [15:0] $end
+$var reg 1 ' out_req $end
+$var reg 16 ( read_value [15:0] $end
+$var reg 1 ) rst_b $end
+$scope module inp $end
+$var wire 1 $ clk $end
+$var wire 1 % inp_req $end
+$var wire 1 ) rst_b $end
+$var parameter 2 * DONE $end
+$var parameter 32 + DW $end
+$var parameter 2 , IDLE $end
+$var parameter 2 - READ $end
+$var reg 1 # inp_ack $end
+$var reg 16 . inp_data [15:0] $end
+$var reg 2 / state [1:0] $end
+$var reg 16 0 temp_data [15:0] $end
+$var integer 32 1 scan_result [31:0] $end
+$upscope $end
+$scope module outp $end
+$var wire 1 $ clk $end
+$var wire 16 2 out_data [15:0] $end
+$var wire 1 ' out_req $end
+$var wire 1 ) rst_b $end
+$var parameter 2 3 DONE $end
+$var parameter 32 4 DW $end
+$var parameter 2 5 IDLE $end
+$var parameter 2 6 WRITE $end
+$var reg 1 ! out_ack $end
+$var reg 2 7 state [1:0] $end
+$upscope $end
+$scope task do_input $end
+$var reg 16 8 value [15:0] $end
+$upscope $end
+$scope task do_output $end
+$var reg 16 9 value [15:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b1 6
+b0 5
+b10000 4
+b10 3
+b1 -
+b0 ,
+b10000 +
+b10 *
+$end
+#0
+$dumpvars
+bx 9
+bx 8
+b0 7
+b0 2
+bx 1
+bx 0
+b0 /
+b0 .
+0)
+bx (
+0'
+b0 &
+0%
+0$
+0#
+b0 "
+0!
+$end
+#50
+1$
+#100
+0$
+#150
+1$
+#200
+0$
+1)
+#250
+1$
+#300
+0$
+#350
+1%
+1$
+#400
+0$
+#450
+b1 /
+1$
+#500
+0$
+#550
+b10 /
+b10100 "
+b10100 .
+b1 1
+b10100 0
+1$
+#600
+0$
+#650
+1#
+1$
+#700
+0$
+#750
+0%
+b10100 8
+1$
+#800
+0$
+#850
+b0 /
+0#
+1$
+#900
+0$
+#950
+b10100 9
+b10100 (
+1$
+#1000
+0$
+#1050
+1'
+b10100 &
+b10100 2
+1$
+#1100
+0$
+#1150
+b1 7
+1$
+#1200
+0$
+#1250
+b10 7
+1$
+#1300
+0$
+#1350
+1!
+1$
+#1400
+0$
+#1450
+0'
+1$
+#1500
+0$
+#1550
+b0 7
+0!
+1$
+#1600
+0$
+#1650
+b11000000111001 9
+1$
+#1700
+0$
+#1750
+1'
+b11000000111001 &
+b11000000111001 2
+1$
+#1800
+0$
+#1850
+b1 7
+1$
+#1900
+0$
+#1950
+b10 7
+1$
+#2000
+0$
+#2050
+1!
+1$
+#2100
+0$
+#2150
+0'
+1$
+#2200
+0$
+#2250
+b0 7
+0!
+1$
+#2300
+0$
+#2350
+1$
+#2400
+0$
+#2450
+1%
+1$
+#2500
+0$
+#2550
+b1 /
+1$
+#2600
+0$
+#2650
+b10 /
+b11110 "
+b11110 .
+b11110 0
+1$
+#2700
+0$
+#2750
+1#
+1$
+#2800
+0$
+#2850
+0%
+b11110 8
+1$
+#2900
+0$
+#2950
+b0 /
+0#
+1$
+#3000
+0$
+#3050
+b11110 9
+b11110 (
+1$
+#3100
+0$
+#3150
+1'
+b11110 &
+b11110 2
+1$
+#3200
+0$
+#3250
+b1 7
+1$
+#3300
+0$
+#3350
+b10 7
+1$
+#3400
+0$
+#3450
+1!
+1$
+#3500
+0$
+#3550
+0'
+1$
+#3600
+0$
+#3650
+b0 7
+0!
+1$
+#3700
+0$
+#3750
+1$
+#3800
+0$
+#3850
+1$
+#3900
+0$
+#3950
+1$
+#4000
+0$
+#4050
+1$
+#4100
+0$
+#4150
+1$
+#4200
+0$
+#4250
+1$

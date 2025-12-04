@@ -18,7 +18,7 @@ module memory_512x16 #(
     integer i;
     initial begin
         for (i = 0; i < (1 << AW); i = i + 1)
-                mem[i] = {DW{1'b0}};
+            mem[i] = {DW{1'b0}};
 
         if (INIT_FILE != "") 
         begin
