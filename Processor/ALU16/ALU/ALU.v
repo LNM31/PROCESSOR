@@ -101,7 +101,19 @@ module ALU (
         .finish(finish)
     );
     
-    assign outbus={1'b0, {16{c[5]}}} & a_out | {{16{c[8]}}} & q_out;
+    //assign outbus={1'b0, {16{c[5]}}} & a_out | {{16{c[8]}}} & q_out;
+
+    reg [15:0] result_reg;
+
+    always @(posedge clk or negedge rst_b) begin
+        if (!rst_b)
+            result_reg <= 16'd0;
+        else if (c[5] | c[8])  // Când rezultatul e pe bus
+            result_reg <= (c[5] ? a_out[15:0] : q_out);
+    end
+
+    assign outbus = result_reg;
+
 
     assign negative = a_out[15];
     assign zero = ~(a_out[15] | a_out[14] | a_out[13] | a_out[12] | a_out[11] | a_out[10] | a_out[9] | a_out[8] | a_out[7] | a_out[6] | a_out[5] | a_out[4] | a_out[3] | a_out[2] | a_out[1] | a_out[0]);

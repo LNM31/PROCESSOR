@@ -1,19 +1,19 @@
 [*]
-[*] GTKWave Analyzer v3.3.121 (w)1999-2024 BSI
-[*] Sat Nov 29 14:35:55 2025
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Fri Dec 26 17:27:46 2025
 [*]
-[dumpfile] "/home/lika/Desktop/PROCESSOR/ALU16/ALU/tb/dump1.fst"
-[dumpfile_mtime] "Sat Nov 29 14:33:00 2025"
-[dumpfile_size] 13071
-[savefile] "/home/lika/Desktop/PROCESSOR/ALU16/ALU/tb/wave.gtkw"
-[timestart] 31778800
-[size] 1920 988
+[dumpfile] "/home/lica/PROCESSOR/Processor/ALU16/ALU/tb/dump1.fst"
+[dumpfile_mtime] "Fri Dec 26 17:27:06 2025"
+[dumpfile_size] 14514
+[savefile] "/home/lica/PROCESSOR/Processor/ALU16/ALU/tb/wave.gtkw"
+[timestart] 0
+[size] 1281 675
 [pos] -1 -1
-*-17.400000 32414300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.400000 262800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [sst_width] 297
 [signals_width] 126
-[sst_expanded] 1
-[sst_vpaned_height] 292
+[sst_expanded] 0
+[sst_vpaned_height] 183
 @28
 ALU_tb2.clk
 ALU_tb2.rst_b

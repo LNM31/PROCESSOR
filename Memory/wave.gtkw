@@ -1,16 +1,16 @@
 [*]
-[*] GTKWave Analyzer v3.3.121 (w)1999-2024 BSI
-[*] Sat Nov 29 20:10:27 2025
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Fri Dec 26 17:58:40 2025
 [*]
-[dumpfile] "/home/lika/Desktop/PROCESSOR/Memory/dump.vcd"
-[dumpfile_mtime] "Sat Nov 29 20:09:32 2025"
-[dumpfile_size] 2640
-[savefile] "/home/lika/Desktop/PROCESSOR/Memory/wave.gtkw"
-[timestart] 0
-[size] 960 988
-[pos] 959 -1
-*-7.500000 104 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-[sst_width] 37
+[dumpfile] "/home/lica/PROCESSOR/Memory/dump.vcd"
+[dumpfile_mtime] "Sun Nov 30 15:51:21 2025"
+[dumpfile_size] 2478
+[savefile] "/home/lica/PROCESSOR/Memory/wave.gtkw"
+[timestart] 177
+[size] 960 715
+[pos] 959 0
+*-7.500000 517 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 43
 [signals_width] 110
 [sst_expanded] 0
 [sst_vpaned_height] 292
