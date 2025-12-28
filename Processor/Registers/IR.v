@@ -1,9 +1,8 @@
-module DR(
+module IR(
     input clk, rst_b,
     input en,
     input [15:0] in,
     output[15:0] out 
-
 );
  
     ffd  f0(.clk(clk), .rst_b(rst_b), .en(en), .d(in[0] ), .q(out[0] ));
