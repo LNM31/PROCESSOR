@@ -25,4 +25,5 @@
 /home/lica/PROCESSOR/Processor/Registers/Y.v
 /home/lica/PROCESSOR/Processor/SignExtendUnit/SignExtendUnit.v
 /home/lica/PROCESSOR/Processor/SignExtendUnit/SEU_Controller.v
+/home/lica/PROCESSOR/SoC/SoC.v
 

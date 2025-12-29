@@ -70,6 +70,7 @@ module SP(
     ffd f14(.clk(clk), .rst_b(rst_b), .en(1'b1), .d(mux_out[14]), .q(qout[14]));
     ffd f15(.clk(clk), .rst_b(rst_b), .en(1'b1), .d(mux_out[15]), .q(qout[15]));
 
-    // Output-ul extern
-    assign out = qout;
+    // Output cu BYPASS - valoarea noua e disponibila imediat!
+    wire writing = ld | inc | dec;
+    assign out = writing ? mux_out : qout;
 endmodule

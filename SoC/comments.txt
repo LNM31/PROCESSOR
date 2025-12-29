@@ -1,0 +1,6 @@
+0407 // 0000 0100 0000 0110 (X = Mem(address))
+0A08 // 0000 1010 0000 0111  (ACC = Mem(Y + offset)) Y=0 
+1409 // 0001 0100 0000 1000   (ACC = Mem(address))
+0C0A // 0000 1100 0000 1001 (Mem(address) = X)
+120B // 0001 0010 0000 1010  (Mem(Y + offset) = ACC)
+180C // 0001 1000 0000 1011   (Mem(address) = ACC)

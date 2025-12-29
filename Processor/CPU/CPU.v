@@ -10,6 +10,7 @@ module CPU(
   output out_req,
   output read, write,
   output [15:0] mem_out,
+  output [15:0] address,
   output inp_req,
   output finish
 );
@@ -35,7 +36,7 @@ module CPU(
   // muxes wires
   wire [15:0] mux2s_out, mux_registers_out;
 
-  mux_3s #(16) operand_3s(
+  mux_3s #(16) mux_registers_3s(
     .d0(x_out),
     .d1(y_out),
     .d2({16'b0}), // z, t, ...
@@ -44,16 +45,23 @@ module CPU(
     .d5({16'b0}),
     .d6({16'b0}),
     .d7({16'b0}),
-    .sel({2'b0, ir_out[9]}),
+    .sel({
+      1'b0, // | ~c[12]
+      1'b0, // | ~c[12]
+      1'b0 | ir_out[9] | c[13] // | ~c[12]
+    }),
     .o(mux_registers_out)
   );
 
-  mux_2s #(16) operand_2s(
+  mux_2s #(16) mux_registers_2s(
     .d0(mux_registers_out),
     .d1(ac_out),
     .d2(seu_out),
     .d3({16'b0}),
-    .sel({1'b0, 1'b0}),
+    .sel({
+      1'b0, // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
+      1'b0 | c[15]  // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
+    }),
     .o(mux2s_out)
   );
 
@@ -61,7 +69,7 @@ module CPU(
     .clk(clk), // 1001
     .rst_b(rst_b),
     .start(c[6] | c[7]),      
-    .s({1'b0, 1'b0, 1'b0, 1'b0}),                     // input  [3:0]
+    .s({1'b0, 1'b0, 1'b0, 1'b0}),  // default adunare
     .inbus(mux2s_out),                 // input  [15:0]
     .outbus(outbus_alu),      // output [15:0]
     .finish(finish_alu),      // output 1 bit
@@ -99,7 +107,10 @@ module CPU(
     .d1(outbus_alu),
     .d2(seu_out),
     .d3({16'b0}),
-    .sel({1'b0 | c[0], c[0] | 1'b0}),
+    .sel({
+      1'b0 | c[0],
+      1'b0 | c[0]
+    }),
     .o(mux_ac_out)
   );
 
@@ -113,18 +124,18 @@ module CPU(
   
   wire [15:0] mux_ar_out;
   mux_3s #(16) mux_ar(
-    .d0(pc_out),
-    .d1(sp_out),
-    .d2(seu_out), 
-    .d3(outbus_alu), 
+    .d0(pc_out),      // 000: FETCH - încarcă adresa din PC
+    .d1(sp_out),      // 001: PUSH/POP - adresa stack
+    .d2(seu_out),     // 010: Adresare directă
+    .d3(outbus_alu),  // 011: Adresare indexată
     .d4({16'b0}),  
     .d5({16'b1}),  // nop
     .d6({16'b1}),  // nop
     .d7({16'b1}),  // nop
     .sel({
-      1'b0 | ~c[1] | c[0],  // s[2]
-      1'b0| ~c[1] | c[3] | c[9] | c[11] | c[14],  // s[1]
-      ~c[1] | c[9] | c[14] | 1'b0 // s[0]
+      1'b0 | c[0],                         // s[2]
+      1'b0 | c[3] | c[9] | c[11] | c[14],  // s[1]
+      1'b0 | c[9] | c[14]                  // s[0]
     }),     // sel urile cresc proportional cu numarul de instructiuni
     .o(mux_ar_out)
   );
@@ -132,7 +143,7 @@ module CPU(
   AR ar(
     .clk(clk),
     .rst_b(rst_b),
-    .en(c[0] | c[3] | c[9] | c[11] | c[14]),    // input 1 bit
+    .en(c[0] | c[1] | c[3] | c[9] | c[11] | c[14]),    // input 1 bit
     .in(mux_ar_out),                    // input [15:0]
     .out(ar_out)              // output[15:0]
   );
@@ -155,11 +166,14 @@ module CPU(
 
   wire [15:0] mux_pc_out;
   mux_2s #(16) mux_pc(
-    .d0(seu_out),
-    .d1({16'b0}),
+    .d0(seu_out), //00
+    .d1({16'b0}), //01
     .d2({16'b1}), //nop
     .d3({16'b1}), //nop
-    .sel({~c[0], c[0]}),
+    .sel({
+      1'b0,
+      1'b0 | c[0]
+    }), 
     .o(mux_pc_out)
   );
 
@@ -176,8 +190,8 @@ module CPU(
     .clk(clk),
     .rst_b(rst_b),
     .ld(c[0]),                   // input 1 bit
-    .inc(),                  // input 1 bit
-    .dec(),                  // input 1 bit
+    .inc(1'b0),                  // input 1 bit
+    .dec(1'b0),                  // input 1 bit
     .in({16'd512}),                   // input [15:0]
     .out(sp_out)             // output[15:0]
   );
@@ -193,9 +207,9 @@ module CPU(
     .d6({16'b1}), //nop
     .d7({16'b1}), //nop
     .sel({
-      ~c[0] | ~c[4],
-      c[0] | c[4],
-      c[0] | ~c[4]
+      1'b0,
+      1'b0 | c[0] | c[4],
+      1'b0 | c[0]
     }),
     .o(mux_x_out)
   );
@@ -220,9 +234,9 @@ module CPU(
     .d6({16'b1}), //nop
     .d7({16'b1}), //nop
     .sel({
-      ~c[0] | ~c[5],
-      c[0] | c[5],
-      c[0] | ~c[5]
+      1'b0,
+      1'b0 | c[0] | c[5],
+      1'b0 | c[0]
     }),
     .o(mux_y_out)
   );
@@ -235,6 +249,13 @@ module CPU(
     .out(y_out)             // output[15:0]
   );
 
-  // to be continued for outputs of the CPU module
-
+  assign out_data = 16'b0;
+  assign out_req = 1'b0;
+  assign inp_req = 1'b0;
+  assign read = c[1] | c[3] | c[9];
+  assign write = c[12] | c[13] | c[15];
+  assign mem_out = mux2s_out;
+  assign address = ar_out;
+  assign finish = finish_cu;
+  
 endmodule
