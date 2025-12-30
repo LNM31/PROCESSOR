@@ -1,18 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Mon Dec 29 14:42:55 2025
+[*] Tue Dec 30 12:11:39 2025
 [*]
 [dumpfile] "/home/lica/PROCESSOR/SoC/soc_tb2.vcd"
-[dumpfile_mtime] "Mon Dec 29 14:34:23 2025"
-[dumpfile_size] 82052
+[dumpfile_mtime] "Tue Dec 30 11:51:44 2025"
+[dumpfile_size] 101727
 [savefile] "/home/lica/PROCESSOR/SoC/wave2.gtkw"
-[timestart] 134500
-[size] 1600 905
-[pos] -27 -24
-*-17.100000 329000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-[sst_width] 297
-[signals_width] 118
-[sst_expanded] 1
+[timestart] 2845500
+[size] 800 905
+[pos] -1 -1
+*-17.100000 2977400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] SoC_tb2.
+[treeopen] SoC_tb2.uut.
+[sst_width] 43
+[signals_width] 142
+[sst_expanded] 0
 [sst_vpaned_height] 263
 @28
 SoC_tb2.clk
@@ -50,9 +52,33 @@ SoC_tb2.STATE[25:0]
 (25)SoC_tb2.STATE[25:0]
 @1401200
 -group_end
-@25
+@24
 SoC_tb2.CTRL[15:0]
+SoC_tb2.SP[15:0]
 @22
+SoC_tb2.PC[15:0]
+SoC_tb2.AR[15:0]
 SoC_tb2.IR[15:0]
+SoC_tb2.AC[15:0]
+SoC_tb2.X[15:0]
+SoC_tb2.Y[15:0]
+@24
+SoC_tb2.SEU[15:0]
+@22
+SoC_tb2.ALU_OUT[15:0]
+SoC_tb2.FLAGS[3:0]
+@28
+SoC_tb2.MEM_RD
+SoC_tb2.MEM_WR
+@22
+SoC_tb2.uut.memory.din[15:0]
+SoC_tb2.uut.memory.dout[15:0]
+@28
+SoC_tb2.uut.cpu.alu.start
+@25
+SoC_tb2.uut.cpu.alu.inbus[15:0]
+@22
+SoC_tb2.ALU_OUT[15:0]
+SoC_tb2.uut.cpu.alu.s[3:0]
 [pattern_trace] 1
 [pattern_trace] 0

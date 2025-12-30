@@ -87,38 +87,76 @@ module SoC_tb2;
   // ==========================================
   // Funcții pentru decodare stare (One-Hot)
   // ==========================================
+  
+  // Funcție care returnează numărul stării active (0-25) din one-hot
+  function [4:0] get_state_num;
+    input [25:0] qout;
+    integer i;
+    begin
+      get_state_num = 5'd31;  // Default: invalid
+      for (i = 0; i < 26; i = i + 1) begin
+        if (qout[i]) get_state_num = i[4:0];
+      end
+    end
+  endfunction
+
+  // Funcție care returnează numele stării
   function [79:0] decode_state;  // 10 caractere * 8 = 80 biți
     input [25:0] qout;
     begin
-      casez (qout)
-        26'b?????????????????????????1: decode_state = "S0_IDLE   ";
-        26'b????????????????????????10: decode_state = "S1_START  ";
-        26'b???????????????????????100: decode_state = "S2_FETCH1 ";
-        26'b??????????????????????1000: decode_state = "S3_DECODE ";
-        26'b?????????????????????10000: decode_state = "S4_LDR1   ";
-        26'b????????????????????100000: decode_state = "S5_LDR_X  ";
-        26'b???????????????????1000000: decode_state = "S6_LDR_Y  ";
-        26'b??????????????????10000000: decode_state = "S7_LDA_X  ";
-        26'b?????????????????100000000: decode_state = "S8_LDA_Y  ";
-        26'b????????????????1000000000: decode_state = "S9_LDA2   ";
-        26'b???????????????10000000000: decode_state = "S10_ALU   ";
-        26'b??????????????100000000000: decode_state = "S11_LDA3  ";
-        26'b?????????????1000000000000: decode_state = "S12_LDA4  ";
-        26'b????????????10000000000000: decode_state = "S13_LDAI1 ";
-        26'b???????????100000000000000: decode_state = "S14_LDAI2 ";
-        26'b??????????1000000000000000: decode_state = "S15_STR1  ";
-        26'b?????????10000000000000000: decode_state = "S16_STR_X ";
-        26'b????????100000000000000000: decode_state = "S17_STR_Y ";
-        26'b???????1000000000000000000: decode_state = "S18_STA_X ";
-        26'b??????10000000000000000000: decode_state = "S19_STA_Y ";
-        26'b?????100000000000000000000: decode_state = "S20_STA2  ";
-        26'b????1000000000000000000000: decode_state = "S21_ALU2  ";
-        26'b???10000000000000000000000: decode_state = "S22_STA3  ";
-        26'b??100000000000000000000000: decode_state = "S23_STA4  ";
-        26'b?1000000000000000000000000: decode_state = "S24_STAI1 ";
-        26'b10000000000000000000000000: decode_state = "S25_STAI2 ";
-        default:                         decode_state = "UNKNOWN   ";
+      case (get_state_num(qout))
+        5'd0:  decode_state = "S0_IDLE   ";
+        5'd1:  decode_state = "S1_START  ";
+        5'd2:  decode_state = "S2_FETCH1 ";
+        5'd3:  decode_state = "S3_DECODE ";
+        5'd4:  decode_state = "S4_LDR1   ";
+        5'd5:  decode_state = "S5_LDR_X  ";
+        5'd6:  decode_state = "S6_LDR_Y  ";
+        5'd7:  decode_state = "S7_LDA_X  ";
+        5'd8:  decode_state = "S8_LDA_Y  ";
+        5'd9:  decode_state = "S9_LDA2   ";
+        5'd10: decode_state = "S10_ALU   ";
+        5'd11: decode_state = "S11_LDA3  ";
+        5'd12: decode_state = "S12_LDA4  ";
+        5'd13: decode_state = "S13_LDAI1 ";
+        5'd14: decode_state = "S14_LDAI2 ";
+        5'd15: decode_state = "S15_STR1  ";
+        5'd16: decode_state = "S16_STR_X ";
+        5'd17: decode_state = "S17_STR_Y ";
+        5'd18: decode_state = "S18_STA_X ";
+        5'd19: decode_state = "S19_STA_Y ";
+        5'd20: decode_state = "S20_STA2  ";
+        5'd21: decode_state = "S21_ALU2  ";
+        5'd22: decode_state = "S22_STA3  ";
+        5'd23: decode_state = "S23_STA4  ";
+        5'd24: decode_state = "S24_STAI1 ";
+        5'd25: decode_state = "S25_STAI2 ";
+        default: decode_state = "UNKNOWN   ";
       endcase
+    end
+  endfunction
+  
+  // Funcție care returnează lista semnalelor de control active
+  function [159:0] decode_ctrl;  // 20 caractere
+    input [15:0] ctrl;
+    begin
+      decode_ctrl = "                    ";  // 20 spații
+      if (ctrl[0])  decode_ctrl = "c0                  ";
+      if (ctrl[1])  decode_ctrl = "c1                  ";
+      if (ctrl[2])  decode_ctrl = "c2                  ";
+      if (ctrl[3])  decode_ctrl = "c3                  ";
+      if (ctrl[4])  decode_ctrl = "c4                  ";
+      if (ctrl[5])  decode_ctrl = "c5                  ";
+      if (ctrl[6])  decode_ctrl = "c6                  ";
+      if (ctrl[7])  decode_ctrl = "c7                  ";
+      if (ctrl[8])  decode_ctrl = "c8                  ";
+      if (ctrl[9])  decode_ctrl = "c9                  ";
+      if (ctrl[10]) decode_ctrl = "c10                 ";
+      if (ctrl[11]) decode_ctrl = "c11                 ";
+      if (ctrl[12]) decode_ctrl = "c12                 ";
+      if (ctrl[13]) decode_ctrl = "c13                 ";
+      if (ctrl[14]) decode_ctrl = "c14                 ";
+      if (ctrl[15]) decode_ctrl = "c15                 ";
     end
   endfunction
 
@@ -166,13 +204,17 @@ module SoC_tb2;
     if (rst_b) begin
       cycle_count = cycle_count + 1;
       $display("═══════════════════════════════════════════════════════════════════════════════");
-      $display("  Ciclu: %4d | Stare: %s | finish=%b", cycle_count, decode_state(STATE), finish);
+      $display("  Ciclu: %4d | Stare: S%0d (%s) | finish=%b", cycle_count, get_state_num(STATE), decode_state(STATE), finish);
       $display("───────────────────────────────────────────────────────────────────────────────");
       $display("  [REGISTRE]  PC=%04h  IR=%04h  AC=%04h  AR=%04h", PC, IR, AC, AR);
       $display("              X=%04h   Y=%04h   SP=%04h  FLAGS=%04b", X, Y, SP, FLAGS);
       $display("  [ALU]       SEU=%04h  ALU_OUT=%04h", SEU, ALU_OUT);
-      $display("  [CONTROL]   STATE=%026b", STATE);
-      $display("              CTRL=%016b", CTRL);
+      $display("  [CONTROL]   STATE_NUM=%2d  CTRL_ACTIVE=%s", get_state_num(STATE), decode_ctrl(CTRL));
+      $display("              CTRL[15:0]=%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d (c15..c0)", 
+               CTRL[15], CTRL[14], CTRL[13], CTRL[12],
+               CTRL[11], CTRL[10], CTRL[9], CTRL[8],
+               CTRL[7], CTRL[6], CTRL[5], CTRL[4],
+               CTRL[3], CTRL[2], CTRL[1], CTRL[0]);
       $display("  [MEMORY]    ADDR=%04h  DIN=%04h  DOUT=%04h  RD=%b  WR=%b", 
                MEM_ADDR, MEM_DIN, MEM_DOUT, MEM_RD, MEM_WR);
     end
@@ -232,19 +274,20 @@ module SoC_tb2;
     // Program în memorie (din program.hex):
     // Addr | Hex  | Instrucțiune
     // -----|------|------------------------------------------
-    // 0000 | 0407 | LDR X, #07     -> X = Mem[07] = 1234
-    // 0001 | 0A08 | LDA ACC, Y+08  -> ACC = Mem[Y+08] = Mem[08] = 1235 (Y=0)
-    // 0002 | 1409 | LDA ACC, #09   -> ACC = Mem[09] = 1236
-    // 0003 | 0C0A | STR X, #0A     -> Mem[0A] = X = 1234
-    // 0004 | 120B | STA Y+0B       -> Mem[Y+0B] = Mem[0B] = ACC = 1236 (Y=0)
-    // 0005 | 180C | STA #0C        -> Mem[0C] = ACC = 1236
-    // 0006 | 0000 | HLT            -> Stop
-    // 0007 | 1234 | Data
-    // 0008 | 1235 | Data
-    // 0009 | 1236 | Data
-    // 000A | 1237 | Data (va fi suprascris cu 1234)
-    // 000B | 1238 | Data (va fi suprascris cu 1236)
-    // 000C | 1239 | Data (va fi suprascris cu 1236)
+    // 0000 | 0408 | LDR X, #08     -> X = Mem[08] = 1234
+    // 0001 | 0A09 | LDA ACC, Y+09  -> ACC = Mem[Y+09] = Mem[09] = 1235 (Y=0)
+    // 0002 | 140A | LDA ACC, #0A   -> ACC = Mem[0A] = 1236
+    // 0003 | 0C0B | STR X, #0B     -> Mem[0B] = X = 1234
+    // 0004 | 120C | STA Y+0C       -> Mem[Y+0C] = Mem[0C] = ACC = 1236 (Y=0)
+    // 0005 | 180D | STA #0D        -> Mem[0D] = ACC = 1236
+    // 0006 | 040D | LDR X, #0D     -> X = Mem[0D] = 1236 (valoarea scrisa anterior)
+    // 0007 | 0000 | HLT            -> Stop
+    // 0008 | 1234 | Data
+    // 0009 | 1235 | Data
+    // 000A | 1236 | Data
+    // 000B | 1237 | Data (va fi suprascris cu 1234)
+    // 000C | 1238 | Data (va fi suprascris cu 1236)
+    // 000D | 1239 | Data (va fi suprascris cu 1236)
 
     // ========================================
     // RESET
@@ -283,20 +326,20 @@ module SoC_tb2;
 
     // Verifică registre
     $display("[TEST] Verificare registre:\n");
-    check("X final         ", X,  16'h1234);  // LDR X, #07 -> X = Mem[07] = 1234
-    check("AC final        ", AC, 16'h1236);  // LDA ACC, #09 -> ACC = Mem[09] = 1236
+    check("X final         ", X,  16'h1236);  // LDR X, #0D -> X = Mem[0D] = 1236 (ultima instr.)
+    check("AC final        ", AC, 16'h1236);  // LDA ACC, #0A -> ACC = Mem[0A] = 1236
     check("Y final         ", Y,  16'h0000);  // Y nu a fost modificat
 
     // Verifică memoria (după STR și STA)
     $display("\n[TEST] Verificare memorie:\n");
-    check_mem(9'h00A, 16'h1234);  // STR X, #0A -> Mem[0A] = X = 1234
-    check_mem(9'h00B, 16'h1236);  // STA Y+0B -> Mem[0B] = ACC = 1236
-    check_mem(9'h00C, 16'h1236);  // STA #0C -> Mem[0C] = ACC = 1236
+    check_mem(9'h00B, 16'h1234);  // STR X, #0B -> Mem[0B] = X = 1234
+    check_mem(9'h00C, 16'h1236);  // STA Y+0C -> Mem[0C] = ACC = 1236
+    check_mem(9'h00D, 16'h1236);  // STA #0D -> Mem[0D] = ACC = 1236
 
     // Date originale (nu trebuie modificate)
-    check_mem(9'h007, 16'h1234);  // Date originale
-    check_mem(9'h008, 16'h1235);  // Date originale
-    check_mem(9'h009, 16'h1236);  // Date originale
+    check_mem(9'h008, 16'h1234);  // Date originale
+    check_mem(9'h009, 16'h1235);  // Date originale
+    check_mem(9'h00A, 16'h1236);  // Date originale
 
     // ========================================
     // Sumar
