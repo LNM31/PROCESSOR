@@ -20,7 +20,7 @@ module CPU(
   wire finish_alu, negative_alu, zero_alu, carry_alu, overflow_alu;
 
   // Control_Unit_CPU wires
-  wire [24:0] c;
+  wire [28:0] c;
   wire finish_cu;
 
   // SignExtendUnit
@@ -72,8 +72,8 @@ module CPU(
     .d2(seu_out),
     .d3(pc_out),
     .sel({                              
-      1'b0 | c[8] | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0])), // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
-      1'b0 | c[15] | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1]))  // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
+      1'b0 | c[8] | c[27] | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0])), // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
+      1'b0 | c[15] | c[27] | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1]))  // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
     }),
     .o(mux2s_out)
   );
@@ -101,6 +101,10 @@ module CPU(
     .out_ack(out_ack),
     .start(start),                 // input  1 bit
     .ack_alu(finish_alu),               // input  1 bit
+    .n(flags_out[3]),
+    .z(flags_out[2]),
+    .carry(flags_out[1]),
+    .v(flags_out[0]),
     .finish(finish_cu),       // output  1 bit
     .c(c)                     // output [15:0]
   );
@@ -186,8 +190,8 @@ module CPU(
     .d2(inp_data), // 10
     .d3({16'b1}), // nop
     .sel({
-      1'b0 | c[23],
-      1'b0 | c[0] | c[21]
+      1'b0 | c[23], // | ~c[25]
+      1'b0 | c[0] | c[21] | c[28]// | ~c[25]
     }), 
     .o(mux_pc_out)
   );
@@ -195,8 +199,8 @@ module CPU(
   PC pc(
     .clk(clk),
     .rst_b(rst_b), // 0000
-    .ld(c[0] | ((c[21] | c[23]) & ~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0])),     // input 1 bit
-    .inc(c[2]),                  // input 1 bit
+    .ld(c[0] | c[25] | c[28] | ((c[21] | c[23]) & ~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0])),     // input 1 bit
+    .inc(c[2] | c[26]),                  // input 1 bit
     .in(mux_pc_out),            // input [15:0]
     .out(pc_out)             // output[15:0]
   );
@@ -268,7 +272,7 @@ module CPU(
   assign out_req = c[24];
   assign inp_req = c[22];
   assign read = c[1] | c[3] | c[9] | c[20];
-  assign write = c[12] | c[13] | c[15] | c[18];
+  assign write = c[12] | c[13] | c[15] | c[18] | c[27];
   assign mem_out = mux2s_out;
   assign address = ar_out;
   assign finish = finish_cu;

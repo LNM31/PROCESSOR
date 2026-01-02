@@ -3,16 +3,17 @@ module Control_Unit_CPU(
   input  [5:0]  op,         // opcode from IR(Instruction Register)
   input         ra,         // RA - Register Address from IR
   input         start,      // start from user
+  input         n, z, carry, v, // flags
   input         inp_ack,  
   input         out_ack,  
   input         ack_alu,    // finish from ALU
   output        finish,     
-  output [24:0] c           // control signals for proccesor
+  output [28:0] c           // control signals for proccesor
 );
   
   // Implementare OneHot
 
-  wire [36:0] qout;
+  wire [45:0] qout;
  
   // 1. HLT
   ffd_OneHot #(.reset_val(1'b1)) S0 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -38,7 +39,18 @@ module Control_Unit_CPU(
     qout[28] |
     qout[31] |
     qout[34] |
-    (qout[36] & out_ack) 
+    (qout[36] & out_ack) |
+    (qout[3] & (
+      (~op[5] & ~op[4] & op[3] & ~op[2] & op[1] & op[0] & ~(z)) |             // 001011 BEQ
+      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & ~op[0] & ~(~z)) |           // 001100 BNE
+      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & op[0] & ~(~z & ~(n ^ v))) | // 001101 BGT
+      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & ~op[0] & ~(n ^ v)) |         // 001110 BLT
+      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & op[0] & ~(~(n ^ v))) |       // 001111 BGE
+      (~op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0] & ~(z | (n ^ v)))   // 010000 BLE
+    )) |
+    qout[37] |
+    qout[42] |
+    qout[45]
   ), .q(qout[2]));
 
   ffd_OneHot S3   (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -205,6 +217,55 @@ module Control_Unit_CPU(
     (qout[36] & ~out_ack)
   ), .q(qout[36]));
   
+  // 12. - 18. BEQ, BNE, BGT, BLT, BGE, BLE, BRA
+  ffd_OneHot S37  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & (
+      (~op[5] & ~op[4] & op[3] & ~op[2] & op[1] & op[0] & (z)) | // 001011 BEQ
+      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & ~op[0] & (~z)) | // 001100 BNE
+      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & op[0] & (~z & ~(n ^ v))) | // 001101 BGT
+      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & ~op[0] & (n ^ v)) | // 001110 BLT
+      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & op[0] & (~(n ^ v))) | // 001111 BGE
+      (~op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0] & (z | (n ^ v))) | // 010000 BLE
+      (~op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & op[0]) // 010001 BRA
+    )
+  ), .q(qout[37]));
+
+  // 19. JMP
+  ffd_OneHot S38  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & ~op[3] & ~op[2] & op[1] & ~op[0]) // 010010
+  ), .q(qout[38]));
+
+  ffd_OneHot S39  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[38]
+  ), .q(qout[39]));
+
+  ffd_OneHot S40  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[39]
+  ), .q(qout[40]));
+  
+  ffd_OneHot S41  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[40]
+  ), .q(qout[41]));
+  
+  ffd_OneHot S42  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[41]
+  ), .q(qout[42]));
+  
+  // 20. RET
+  ffd_OneHot S43  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & ~op[3] & ~op[2] & op[1] & op[0]) // 010011
+  ), .q(qout[43]));
+  
+  ffd_OneHot S44  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[43]
+  ), .q(qout[44]));
+  
+  ffd_OneHot S45  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[44]
+  ), .q(qout[45]));
+  
   assign finish = qout[0];
   assign c[0] = qout[1];
   assign c[1] = qout[2];
@@ -222,15 +283,19 @@ module Control_Unit_CPU(
   assign c[13] = qout[17];
   assign c[14] = qout[22];
   assign c[15] = qout[23] | qout[25];
-  assign c[16] = qout[26];
-  assign c[17] = qout[27];
+  assign c[16] = qout[26] | qout[39];
+  assign c[17] = qout[27] | qout[40];
   assign c[18] = qout[28];
-  assign c[19] = qout[29];
-  assign c[20] = qout[30];
+  assign c[19] = qout[29] | qout[43];
+  assign c[20] = qout[30] | qout[44];
   assign c[21] = qout[31];
   assign c[22] = qout[32];
   assign c[23] = qout[34];
   assign c[24] = qout[35];
+  assign c[25] = qout[37] | qout[42];
+  assign c[26] = qout[38];
+  assign c[27] = qout[41];
+  assign c[28] = qout[45];
   // signals to be continued
 
 endmodule

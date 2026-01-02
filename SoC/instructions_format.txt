@@ -1,0 +1,110 @@
+/*
+================================================================================
+                        PROCESSOR ISA SPECIFICATION
+================================================================================
+Word Size: 16 bits
+Instruction Size: 16 bits
+Registers: ACC (Accumulator), X, Y, PC (Program Counter)
+
+--------------------------------------------------------------------------------
+1. INSTRUCTION ENCODING FORMATS
+--------------------------------------------------------------------------------
+[15:10] = Opcode (6 bits) for all formats.
+
+Type A (Reg + Offset/Imm9):  | Opcode[6] | Reg[1] | Immediate/Offset[9] |
+Type B (Direct Address/Imm10):| Opcode[6] | Address/Immediate[10]       |
+Type C (Stack/Selector):     | Opcode[6] | Reserved[6] | Selector[4]    |
+Type D (ALU Reg/Imm8):       | Opcode[6] | Dest[1] | M[1] | Operand[8]  |
+Type E (Compare/Test):       | Opcode[6] | Op1[5] | Op2[5]              |
+Type F (Move):               | Opcode[6] | Op1[2] | Op2[2] | M[1] | Imm[5] |
+
+--------------------------------------------------------------------------------
+2. OPCODE TABLE & BEHAVIOR
+--------------------------------------------------------------------------------
+*/
+
+// --- CONTROL & MEMORY (REG BASED) ---
+// Format: | Opcode (6) | Reg (1) | Imm (9) |
+// Reg bit: 0 -> X, 1 -> Y
+parameter HLT = 6'b000000; // Halt
+parameter LDR = 6'b000001; // Load Reg: Reg = Mem[Address] (Imm9)
+parameter LDA = 6'b000010; // Load Acc Offset: Acc = Mem[Reg + Offset]
+parameter STR = 6'b000011; // Store Reg: Mem[Address] = Reg
+parameter STA = 6'b000100; // Store Acc Offset: Mem[Reg + Offset] = Acc
+
+// --- MEMORY (DIRECT) ---
+// Format: | Opcode (6) | Address (10) |
+parameter LDA_IMM = 6'b000101; // Load Acc: Acc = Mem[Address]
+parameter STA_IMM = 6'b000110; // Store Acc: Mem[Address] = Acc
+
+// --- STACK & IO ---
+// Format: | Opcode (6) | Unused (6) | Selector (4) |
+// Selector: 0000-PC, 0001-Acc, 0010-X, 0011-Y
+parameter PSH = 6'b000111; // Push {Selector}
+parameter POP = 6'b001000; // Pop {Selector}
+parameter IN  = 6'b001001; // Input: Reg = IN
+parameter OUT = 6'b001010; // Output: OUT = Reg
+
+// --- BRANCH INSTRUCTIONS ---
+// Format: | Opcode (6) | Address (10) |
+parameter BEQ = 6'b001011; // Branch Equal (Z==1)
+parameter BNE = 6'b001100; // Branch Not Equal (Z==0)
+parameter BGT = 6'b001101; // Branch Greater (Z==0 && N==V)
+parameter BLT = 6'b001110; // Branch Less (N!=V)
+parameter BGE = 6'b001111; // Branch Greater/Equal (N==V)
+parameter BLE = 6'b010000; // Branch Less/Equal (Z==1 || N!=V)
+parameter BRA = 6'b010001; // Branch Always
+parameter JMP = 6'b010010; // Jump: PSH {PC+1} + BRA Address
+parameter RET = 6'b010011; // Return: POP {PC}
+
+// --- ARITHMETIC & LOGIC (REGISTER/IMMEDIATE) ---
+// Format: | Opcode (6) | Dest(1) | M(1) | Operand(8) |
+// M=0: Operand is Reg (X/Y), M=1: Operand is Immediate(8)
+// Dest: 0 -> X, 1 -> Y (Target for operations if applicable, else Acc)
+parameter ADD_R = 6'b010100; // Acc = Acc + (M ? Imm : Reg)
+parameter SUB_R = 6'b010101; // Acc = Acc - (M ? Imm : Reg)
+parameter MUL_R = 6'b010110; // Acc = Acc * (M ? Imm : Reg)
+parameter DIV_R = 6'b010111; // Acc = Acc / (M ? Imm : Reg)
+parameter MOD_R = 6'b011000; // Acc = Acc % (M ? Imm : Reg)
+parameter AND_R = 6'b011001; // Acc = Acc & (M ? Imm : Reg)
+parameter OR_R  = 6'b011010; // Acc = Acc | (M ? Imm : Reg)
+parameter XOR_R = 6'b011011; // Acc = Acc ^ (M ? Imm : Reg)
+parameter NOT_R = 6'b011100; // M=0: ~Reg, M=1: ~Imm
+
+// --- ARITHMETIC & LOGIC (MEMORY DIRECT) ---
+// Format: | Opcode (6) | Address (10) |
+parameter ADD_M = 6'b011101; // Acc = Acc + Mem[Address]
+parameter SUB_M = 6'b011110; // Acc = Acc - Mem[Address]
+parameter MUL_M = 6'b011111; // Acc = Acc * Mem[Address]
+parameter DIV_M = 6'b100000; // Acc = Acc / Mem[Address]
+parameter MOD_M = 6'b100001; // Acc = Acc % Mem[Address]
+parameter AND_M = 6'b100010; // Acc = Acc & Mem[Address]
+parameter OR_M  = 6'b100011; // Acc = Acc | Mem[Address]
+parameter XOR_M = 6'b100100; // Acc = Acc ^ Mem[Address]
+parameter NOT_M = 6'b100101; // Acc = ~Mem[Address]
+
+// --- SHIFTS ---
+// Format: | Opcode (6) | Unused |
+parameter LSR = 6'b100110; // Acc = Acc >> 1
+parameter LSL = 6'b100111; // Acc = Acc << 1
+parameter RSR = 6'b101000; // Rotate Right Acc
+parameter RSL = 6'b101001; // Rotate Left Acc
+
+// --- COMPARE & TEST ---
+// Format: | Opcode (6) | Op1 (5) | Op2 (5) |
+parameter CMP = 6'b101010; // Compare Op1 - Op2 (Update Flags)
+parameter TST = 6'b101011; // Test Op1 & Op2 (Update Flags)
+
+// --- MOVE ---
+// Format: | Opcode (6) | Dest(2) | Src(2) | M(1) | Imm(5) |
+parameter MOV = 6'b101100; // If M=0: Dest = Src; If M=1: Dest = Imm5;
+
+/*
+--------------------------------------------------------------------------------
+3. FLAG DEFINITIONS
+--------------------------------------------------------------------------------
+Z (Zero): Set if result == 0
+N (Negative): Set if result MSB == 1
+C (Carry): Set if unsigned overflow
+V (Overflow): Set if signed overflow
+*/

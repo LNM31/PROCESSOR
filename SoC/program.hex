@@ -1,84 +1,145 @@
 // =========================================================================
-// TEST PROGRAM - PUSH, POP, INP, OUT + instructiuni de baza
+// TEST PROGRAM - Toate instructiunile implementate
 // =========================================================================
-// SP initial = 0x01FF (stack creste in jos)
-// Format PUSH/POP/INP/OUT: opcode[15:10], imm[9:0]
-// imm[9:4] = 000000, imm[3:0] = reg_code (0=PC, 1=AC, 2=X, 3=Y)
+// SP initial = 0x200 (512), stack creste in jos
+// Memoria: 512 adrese (9 biti), adrese 0x000 - 0x1FF
 // =========================================================================
 
-// --- SECTIUNEA 1: Incarca valori initiale ---
-0430 // 0x00: LDR X, #30      -> X = Mem[30] = 0002
-0631 // 0x01: LDR Y, #31      -> Y = Mem[31] = 0003
-1432 // 0x02: LDA AC, #32     -> AC = Mem[32] = 1234
+// ==========================================================================
+// SECTIUNEA 1: Test LDR, LDA_IMM, STR, STA_IMM (instructiuni de baza)
+// ==========================================================================
+0430    // 0x00: LDR X, #30         -> X = Mem[0x30] = 0x000A (10)
+0631    // 0x01: LDR Y, #31         -> Y = Mem[0x31] = 0x0014 (20)
+1432    // 0x02: LDA_IMM #32        -> AC = Mem[0x32] = 0x001E (30)
 
-// --- SECTIUNEA 2: Test PUSH ---
-1C01 // 0x03: PUSH AC         -> Mem[SP] = AC = 1234, SP--  (SP: 1FF->1FE)
-1C02 // 0x04: PUSH X          -> Mem[SP] = X = 0002, SP--   (SP: 1FE->1FD)
-1C03 // 0x05: PUSH Y          -> Mem[SP] = Y = 0003, SP--   (SP: 1FD->1FC)
+// ==========================================================================
+// SECTIUNEA 2: Test PUSH/POP
+// ==========================================================================
+1C01    // 0x03: PUSH AC            -> Mem[0x1FF] = AC = 0x001E, SP = 0x1FE
+1C02    // 0x04: PUSH X             -> Mem[0x1FE] = X = 0x000A, SP = 0x1FD
+1C03    // 0x05: PUSH Y             -> Mem[0x1FD] = Y = 0x0014, SP = 0x1FC
 
-// --- SECTIUNEA 3: Schimba valorile registrelor ---
-0433 // 0x06: LDR X, #33      -> X = Mem[33] = AAAA (valoare noua)
-0634 // 0x07: LDR Y, #34      -> Y = Mem[34] = BBBB (valoare noua)
-1435 // 0x08: LDA AC, #35     -> AC = Mem[35] = CCCC (valoare noua)
+0433    // 0x06: LDR X, #33         -> X = Mem[0x33] = 0xAAAA (schimba valori)
+0634    // 0x07: LDR Y, #34         -> Y = Mem[0x34] = 0xBBBB
+1435    // 0x08: LDA_IMM #35        -> AC = Mem[0x35] = 0xCCCC
 
-// --- SECTIUNEA 4: Test POP (ordine inversa) ---
-2003 // 0x09: POP Y           -> SP++, Y = Mem[SP] = 0003   (SP: 1FC->1FD)
-2002 // 0x0A: POP X           -> SP++, X = Mem[SP] = 0002   (SP: 1FD->1FE)
-2001 // 0x0B: POP AC          -> SP++, AC = Mem[SP] = 1234  (SP: 1FE->1FF)
+2003    // 0x09: POP Y              -> SP = 0x1FD, Y = Mem[0x1FD] = 0x0014
+2002    // 0x0A: POP X              -> SP = 0x1FE, X = Mem[0x1FE] = 0x000A
+2001    // 0x0B: POP AC             -> SP = 0x1FF, AC = Mem[0x1FF] = 0x001E
 
-// --- SECTIUNEA 5: Store pentru verificare POP ---
-0C36 // 0x0C: STR X, #36      -> Mem[36] = X = 0002
-0E37 // 0x0D: STR Y, #37      -> Mem[37] = Y = 0003
-1838 // 0x0E: STA #38         -> Mem[38] = AC = 1234
+// Store rezultate POP pentru verificare
+0C40    // 0x0C: STR X, #40         -> Mem[0x40] = X = 0x000A
+0E41    // 0x0D: STR Y, #41         -> Mem[0x41] = Y = 0x0014
+1842    // 0x0E: STA_IMM #42        -> Mem[0x42] = AC = 0x001E
 
-// --- SECTIUNEA 6: Test INP/OUT ---
-2401 // 0x0F: INP AC          -> AC = input de la tastatura
-1839 // 0x10: STA #39         -> Mem[39] = AC (valoare citita)
-2402 // 0x11: INP X           -> X = input de la tastatura
-0C3A // 0x12: STR X, #3A      -> Mem[3A] = X (valoare citita)
-2801 // 0x13: OUT AC          -> Afiseaza AC
-2802 // 0x14: OUT X           -> Afiseaza X
+// ==========================================================================
+// SECTIUNEA 3: Test JMP si RET
+// ==========================================================================
+// JMP salveaza PC+1 pe stack si sare la adresa
+// RET restaureaza PC de pe stack
 
-// --- SECTIUNEA 7: HLT ---
-0000 // 0x15: HLT             -> Stop
+4820    // 0x0F: JMP 0x20           -> PUSH PC+1 (0x10), PC = 0x20 (subroutine)
+        // Dupa RET, executia continua de la 0x10
 
-// --- PADDING ---
-0000 // 0x16
-0000 // 0x17
-0000 // 0x18
-0000 // 0x19
-0000 // 0x1A
-0000 // 0x1B
-0000 // 0x1C
-0000 // 0x1D
-0000 // 0x1E
-0000 // 0x1F
-0000 // 0x20
-0000 // 0x21
-0000 // 0x22
-0000 // 0x23
-0000 // 0x24
-0000 // 0x25
-0000 // 0x26
-0000 // 0x27
-0000 // 0x28
-0000 // 0x29
-0000 // 0x2A
-0000 // 0x2B
-0000 // 0x2C
-0000 // 0x2D
-0000 // 0x2E
-0000 // 0x2F
+// Dupa return din subroutine:
+0C43    // 0x10: STR X, #43         -> Mem[0x43] = X = 0x0055 (setat in subroutine)
+0E44    // 0x11: STR Y, #44         -> Mem[0x44] = Y = 0x00AA (setat in subroutine)
 
-// --- DATA SECTION (0x30-0x3F) ---
-0002 // 0x30: valoare initiala X
-0003 // 0x31: valoare initiala Y
-1234 // 0x32: valoare initiala AC
-AAAA // 0x33: valoare noua X (dupa PUSH, inainte POP)
-BBBB // 0x34: valoare noua Y (dupa PUSH, inainte POP)
-CCCC // 0x35: valoare noua AC (dupa PUSH, inainte POP)
-0000 // 0x36: pentru verificare X dupa POP
-0000 // 0x37: pentru verificare Y dupa POP
-0000 // 0x38: pentru verificare AC dupa POP
-0000 // 0x39: pentru valoare INP AC
-0000 // 0x3A: pentru valoare INP X
+// ==========================================================================
+// SECTIUNEA 4: Test BRA (branch always)
+// ==========================================================================
+4415    // 0x12: BRA 0x15           -> PC = 0x15 (sare peste 0x13, 0x14)
+
+// Aceste instructiuni NU ar trebui executate (sarite de BRA)
+0436    // 0x13: LDR X, #36         -> X = 0xDEAD (NU se executa)
+0637    // 0x14: LDR Y, #37         -> Y = 0xBEEF (NU se executa)
+
+// Continuare dupa BRA
+1845    // 0x15: STA_IMM #45        -> Mem[0x45] = AC = 0x001E (verifica BRA a sarit)
+
+// ==========================================================================
+// SECTIUNEA 5: Test Conditional Branches (BNE, BEQ, etc.)
+// ==========================================================================
+// Nota: Flag-urile sunt probabil 0 dupa reset (Z=0, N=0, V=0, C=0)
+// BNE (Z=0) ar trebui sa fie TAKEN
+// BEQ (Z=1) ar trebui sa fie NOT TAKEN
+
+3019    // 0x16: BNE 0x19           -> Z=0, deci branch TAKEN, PC = 0x19
+
+// Aceste instructiuni NU ar trebui executate (sarite de BNE)
+0436    // 0x17: LDR X, #36         -> X = 0xDEAD (NU se executa)
+0637    // 0x18: LDR Y, #37         -> Y = 0xBEEF (NU se executa)
+
+// Continuare dupa BNE
+1846    // 0x19: STA_IMM #46        -> Mem[0x46] = AC (verifica BNE a sarit)
+
+// Test BEQ - ar trebui sa NU fie luat (Z=0)
+2C1C    // 0x1A: BEQ 0x1C           -> Z=0, deci branch NOT TAKEN, continua la 0x1B
+
+1847    // 0x1B: STA_IMM #47        -> Mem[0x47] = AC (verifica BEQ NU a sarit)
+
+// ==========================================================================
+// SECTIUNEA 6: HLT
+// ==========================================================================
+0000    // 0x1C: HLT                -> Stop
+
+// ==========================================================================
+// PADDING (0x1D - 0x1F)
+// ==========================================================================
+0000    // 0x1D
+0000    // 0x1E
+0000    // 0x1F
+
+// ==========================================================================
+// SUBROUTINE la adresa 0x20 (apelata de JMP)
+// ==========================================================================
+0438    // 0x20: LDR X, #38         -> X = Mem[0x38] = 0x0055
+0639    // 0x21: LDR Y, #39         -> Y = Mem[0x39] = 0x00AA
+4C00    // 0x22: RET                -> POP PC, revine la 0x10
+
+// ==========================================================================
+// PADDING (0x23 - 0x2F)
+// ==========================================================================
+0000    // 0x23
+0000    // 0x24
+0000    // 0x25
+0000    // 0x26
+0000    // 0x27
+0000    // 0x28
+0000    // 0x29
+0000    // 0x2A
+0000    // 0x2B
+0000    // 0x2C
+0000    // 0x2D
+0000    // 0x2E
+0000    // 0x2F
+
+// ==========================================================================
+// DATA SECTION (0x30 - 0x4F)
+// ==========================================================================
+000A    // 0x30: valoare initiala X = 10
+0014    // 0x31: valoare initiala Y = 20
+001E    // 0x32: valoare initiala AC = 30
+AAAA    // 0x33: valoare temporara X
+BBBB    // 0x34: valoare temporara Y
+CCCC    // 0x35: valoare temporara AC
+DEAD    // 0x36: valoare "bad" X (nu ar trebui citita)
+BEEF    // 0x37: valoare "bad" Y (nu ar trebui citita)
+0055    // 0x38: valoare subroutine X
+00AA    // 0x39: valoare subroutine Y
+0000    // 0x3A
+0000    // 0x3B
+0000    // 0x3C
+0000    // 0x3D
+0000    // 0x3E
+0000    // 0x3F
+
+// Zona pentru rezultate verificare (0x40 - 0x4F)
+0000    // 0x40: rezultat POP X
+0000    // 0x41: rezultat POP Y
+0000    // 0x42: rezultat POP AC
+0000    // 0x43: rezultat subroutine X
+0000    // 0x44: rezultat subroutine Y
+0000    // 0x45: marker BRA executat
+0000    // 0x46: marker BNE executat
+0000    // 0x47: marker BEQ NOT taken

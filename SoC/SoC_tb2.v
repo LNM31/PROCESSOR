@@ -95,13 +95,13 @@ module SoC_tb2;
   // Funcții pentru decodare stare (One-Hot)
   // ==========================================
   
-  // Funcție care returnează numărul stării active (0-36) din one-hot
+  // Funcție care returnează numărul stării active (0-45) din one-hot
   function [5:0] get_state_num;
-    input [36:0] qout;
+    input [45:0] qout;
     integer i;
     begin
       get_state_num = 6'd63;  // Default: invalid
-      for (i = 0; i < 37; i = i + 1) begin
+      for (i = 0; i < 46; i = i + 1) begin
         if (qout[i]) get_state_num = i[5:0];
       end
     end
@@ -109,7 +109,7 @@ module SoC_tb2;
 
   // Funcție care returnează numele stării
   function [79:0] decode_state;  // 10 caractere * 8 = 80 biți
-    input [36:0] qout;
+    input [45:0] qout;
     begin
       case (get_state_num(qout))
         6'd0:  decode_state = "S0_IDLE   ";
@@ -149,6 +149,15 @@ module SoC_tb2;
         6'd34: decode_state = "S34_INP3  ";
         6'd35: decode_state = "S35_OUT1  ";
         6'd36: decode_state = "S36_OUT2  ";
+        6'd37: decode_state = "S37_BRANCH";
+        6'd38: decode_state = "S38_JMP1  ";
+        6'd39: decode_state = "S39_JMP2  ";
+        6'd40: decode_state = "S40_JMP3  ";
+        6'd41: decode_state = "S41_JMP4  ";
+        6'd42: decode_state = "S42_JMP5  ";
+        6'd43: decode_state = "S43_RET1  ";
+        6'd44: decode_state = "S44_RET2  ";
+        6'd45: decode_state = "S45_RET3  ";
         default: decode_state = "UNKNOWN   ";
       endcase
     end
@@ -156,7 +165,7 @@ module SoC_tb2;
   
   // Funcție care returnează lista semnalelor de control active
   function [159:0] decode_ctrl;  // 20 caractere
-    input [24:0] ctrl;
+    input [28:0] ctrl;
     begin
       decode_ctrl = "                    ";  // 20 spații
       if (ctrl[0])  decode_ctrl = "c0                  ";
@@ -184,6 +193,10 @@ module SoC_tb2;
       if (ctrl[22]) decode_ctrl = "c22                 ";
       if (ctrl[23]) decode_ctrl = "c23                 ";
       if (ctrl[24]) decode_ctrl = "c24                 ";
+      if (ctrl[25]) decode_ctrl = "c25                 ";
+      if (ctrl[26]) decode_ctrl = "c26                 ";
+      if (ctrl[27]) decode_ctrl = "c27                 ";
+      if (ctrl[28]) decode_ctrl = "c28                 ";
     end
   endfunction
 
@@ -202,8 +215,8 @@ module SoC_tb2;
   wire [15:0] ALU_OUT = uut.cpu.outbus_alu;
   
   // Control Unit
-  wire [36:0] STATE = uut.cpu.cu.qout;  // Stările FF (One-Hot) - 37 stări (S0-S36)
-  wire [24:0] CTRL  = uut.cpu.c;        // Semnale de control - 25 semnale
+  wire [45:0] STATE = uut.cpu.cu.qout;  // Stările FF (One-Hot) - 46 stări (S0-S45)
+  wire [28:0] CTRL  = uut.cpu.c;        // Semnale de control - 29 semnale
   
   // Memory
   wire [15:0] MEM_ADDR = uut.address;
@@ -237,14 +250,14 @@ module SoC_tb2;
       $display("              X=%04h   Y=%04h   SP=%04h  FLAGS=%04b", X, Y, SP, FLAGS);
       $display("  [ALU]       SEU=%04h  ALU_OUT=%04h", SEU, ALU_OUT);
       $display("  [CONTROL]   STATE_NUM=%2d  CTRL_ACTIVE=%s", get_state_num(STATE), decode_ctrl(CTRL));
-      $display("              CTRL[24:0]=%d_%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d (c24..c0)",
-               CTRL[24],
-               CTRL[23], CTRL[22], CTRL[21], CTRL[20],
-               CTRL[19], CTRL[18], CTRL[17], CTRL[16],
-               CTRL[15], CTRL[14], CTRL[13], CTRL[12],
-               CTRL[11], CTRL[10], CTRL[9], CTRL[8],
-               CTRL[7], CTRL[6], CTRL[5], CTRL[4],
-               CTRL[3], CTRL[2], CTRL[1], CTRL[0]);
+      $display("              CTRL[28:0]=%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d_%d%d%d%d%d (c28..c0)",
+               CTRL[28], CTRL[27], CTRL[26], CTRL[25],
+               CTRL[24], CTRL[23], CTRL[22], CTRL[21],
+               CTRL[20], CTRL[19], CTRL[18], CTRL[17],
+               CTRL[16], CTRL[15], CTRL[14], CTRL[13],
+               CTRL[12], CTRL[11], CTRL[10], CTRL[9],
+               CTRL[8], CTRL[7], CTRL[6], CTRL[5],
+               CTRL[4], CTRL[3], CTRL[2], CTRL[1], CTRL[0]);
       $display("  [MEMORY]    ADDR=%04h  DIN=%04h  DOUT=%04h  RD=%b  WR=%b", 
                MEM_ADDR, MEM_DIN, MEM_DOUT, MEM_RD, MEM_WR);
     end
