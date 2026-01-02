@@ -56,10 +56,12 @@ module CPU(
     .d6({16'b0}),
     .d7({16'b0}),
     .sel({
-      1'b0,  // sel[2] = 0 (folosim doar d0=X si d1=Y)
-      1'b0,  // sel[1] = 0 (folosim doar d0=X si d1=Y)
-      // sel[0]: ir[9] pentru STR, c[13] pentru STR Y, ir[0] pentru PUSH/OUT
-      1'b0 | ir_out[9] | c[13] | ((c[18] | c[24]) & ir_out[0])
+      // sel[2] = (ir[2] & ir[1]) | (ir[3] & ~ir[2]) - pentru d4-d7
+      ((c[18] | c[24]) & ((ir_out[2] & ir_out[1]) | (ir_out[3] & ~ir_out[2]))),
+      // sel[1] = (ir[2] & ~ir[1]) | (ir[3] & ~ir[2]) - pentru d2-d3, d6-d7
+      ((c[18] | c[24]) & ((ir_out[2] & ~ir_out[1]) | (ir_out[3] & ~ir_out[2]))),
+      // sel[0] = ir[0] pentru PUSH/OUT, ir[9] pentru STR
+      ir_out[9] | c[13] | ((c[18] | c[24]) & ir_out[0])
     }),
     .o(mux_registers_out)
   );
@@ -70,7 +72,7 @@ module CPU(
     .d2(seu_out),
     .d3(pc_out),
     .sel({                              
-      1'b0 | c[8] | ((c[18] | c[24]) & ((ir_out[3] & (ir_out[2] | ir_out[1])) | (~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0]))), // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
+      1'b0 | c[8] | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0])), // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
       1'b0 | c[15] | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1]))  // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
     }),
     .o(mux2s_out)
