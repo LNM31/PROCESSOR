@@ -170,7 +170,7 @@ module CPU(
   FLAGS flags(
     .clk(clk),
     .rst_b(rst_b),
-    .en(1'b1),                    // input 1 bit
+    .en(finish_alu),                    // input 1 bit
     .in({negative_alu, zero_alu, carry_alu, overflow_alu}),     // input [3:0]
     .out(flags_out)           // output[3:0]
   );
@@ -200,7 +200,7 @@ module CPU(
     .clk(clk),
     .rst_b(rst_b), // 0000
     .ld(c[0] | c[25] | c[28] | ((c[21] | c[23]) & ~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0])),     // input 1 bit
-    .inc(c[2] | c[26]),                  // input 1 bit
+    .inc(c[2]),                  // input 1 bit
     .in(mux_pc_out),            // input [15:0]
     .out(pc_out)             // output[15:0]
   );

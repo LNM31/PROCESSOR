@@ -315,51 +315,23 @@ module SoC_tb2;
     $display("\n");
 
     // =========================================================================
-    // TEST PROGRAM - PUSH, POP, INP, OUT + instructiuni de baza
+    // TEST PROGRAM - LDR, LDA, STR, STA, PUSH, POP, JMP, RET, BRA, BNE, BEQ
     // =========================================================================
-    // SP initial = 512 (0x200), dupa primul PUSH devine 511 (0x1FF)
+    // SP initial = 512 (0x200), stack creste in jos
     // =========================================================================
     //
-    // Addr | Hex  | Instrucțiune               | Descriere
-    // -----|------|----------------------------|----------------------------------
-    // 0x00 | 0430 | LDR X, #30                 | X = Mem[30] = 0002
-    // 0x01 | 0631 | LDR Y, #31                 | Y = Mem[31] = 0003
-    // 0x02 | 1432 | LDA AC, #32                | AC = Mem[32] = 1234
-    // -----|------|----------------------------|----------------------------------
-    // 0x03 | 1C00 | PUSH AC                    | Mem[FF] = 1234, SP = FE
-    // 0x04 | 1E00 | PUSH X                     | Mem[FE] = 0002, SP = FD
-    // 0x05 | 2000 | PUSH Y                     | Mem[FD] = 0003, SP = FC
-    // -----|------|----------------------------|----------------------------------
-    // 0x06 | 0433 | LDR X, #33                 | X = AAAA (schimba valori)
-    // 0x07 | 0634 | LDR Y, #34                 | Y = BBBB
-    // 0x08 | 1435 | LDA AC, #35                | AC = CCCC
-    // -----|------|----------------------------|----------------------------------
-    // 0x09 | 2200 | POP Y                      | SP = FD, Y = Mem[FD] = 0003
-    // 0x0A | 2400 | POP X                      | SP = FE, X = Mem[FE] = 0002
-    // 0x0B | 2600 | POP AC                     | SP = FF, AC = Mem[FF] = 1234
-    // -----|------|----------------------------|----------------------------------
-    // 0x0C | 0C36 | STR X, #36                 | Mem[36] = X = 0002
-    // 0x0D | 0E37 | STR Y, #37                 | Mem[37] = Y = 0003
-    // 0x0E | 1838 | STA #38                    | Mem[38] = AC = 1234
-    // -----|------|----------------------------|----------------------------------
-    // 0x0F | 2800 | INP AC                     | AC = keyboard input
-    // 0x10 | 1839 | STA #39                    | Mem[39] = AC
-    // 0x11 | 2A00 | INP X                      | X = keyboard input
-    // 0x12 | 0C3A | STR X, #3A                 | Mem[3A] = X
-    // 0x13 | 2C00 | OUT AC                     | Display AC
-    // 0x14 | 2E00 | OUT X                      | Display X
-    // -----|------|----------------------------|----------------------------------
-    // 0x15 | 0000 | HLT                        | Stop
-    //
-    // CAZURI ACOPERITE:
+    // INSTRUCTIUNI TESTATE:
     // [x] LDR X/Y       - Load register direct
-    // [x] LDA AC        - Load accumulator direct
+    // [x] LDA_IMM       - Load accumulator direct
     // [x] STR X/Y       - Store register direct
-    // [x] STA           - Store accumulator direct
+    // [x] STA_IMM       - Store accumulator direct
     // [x] PUSH AC/X/Y   - Push pe stack
     // [x] POP AC/X/Y    - Pop de pe stack
-    // [x] INP AC/X      - Input de la tastatura
-    // [x] OUT AC/X      - Output pe display
+    // [x] JMP           - Jump to subroutine (PUSH PC+1, then branch)
+    // [x] RET           - Return from subroutine (POP PC)
+    // [x] BRA           - Branch always
+    // [x] BNE           - Branch if not equal (Z=0)
+    // [x] BEQ           - Branch if equal (Z=1) - test NOT taken
     // [x] HLT           - Halt
 
     // ========================================
@@ -367,7 +339,7 @@ module SoC_tb2;
     // ========================================
     $display("\n[TEST] Aplicare RESET...\n");
     do_reset(3);
-    
+
     // Verifică starea inițială
     $display("\n[TEST] Verificare stare dupa RESET:\n");
     check("PC dupa reset   ", PC, 16'h0000);
@@ -386,10 +358,8 @@ module SoC_tb2;
     // Execuție - așteaptă HLT
     // ========================================
     $display("\n[TEST] Executie program - astept HLT...\n");
-    $display("[INFO] Programul va cere 2 valori de la tastatura (INP AC si INP X).\n");
-    $display("[INFO] Introduceti valori in format hexazecimal (ex: 00AB, 1234).\n");
-    wait_finish(500);  // max 500 cicluri (timp pentru input)
-    
+    wait_finish(300);  // max 300 cicluri
+
 
     // ========================================
     // Verificări finale
@@ -400,38 +370,50 @@ module SoC_tb2;
     $display("╚═══════════════════════════════════════════════════════════════════════════════╝");
     $display("\n");
 
-    // Nota: Nu verificam registrele X, Y, AC direct deoarece sunt suprascrise de INP
-    // Verificarea POP se face prin memoria (Mem[036], Mem[037], Mem[038]) - vezi mai jos
+    // --- Test 1: PUSH values on stack ---
+    // Nota: Mem[1FF] este suprascris de JMP (salveaza PC+1=0x10 pentru RET)
+    $display("\n[TEST] Verificare STACK (valorile PUSH-uite + JMP return addr):\n");
+    check_mem(9'h1FF, 16'h0010);  // JMP suprascrie cu PC+1 = 0x0010 (return address)
+    check_mem(9'h1FE, 16'h000A);  // PUSH X -> Mem[1FE] = X = 0x000A (10)
+    check_mem(9'h1FD, 16'h0014);  // PUSH Y -> Mem[1FD] = Y = 0x0014 (20)
 
-    // Verifică memoria (rezultate PUSH/POP - stack)
-    // SP initial = 512, dupa PUSH: 511, 510, 509
-    $display("\n[TEST] Verificare STACK (valorile PUSH-uite):\n");
-    check_mem(9'h1FF, 16'h1234);  // PUSH AC primul -> Mem[1FF] = AC = 1234
-    check_mem(9'h1FE, 16'h0002);  // PUSH X al doilea -> Mem[1FE] = X = 0002
-    check_mem(9'h1FD, 16'h0003);  // PUSH Y al treilea -> Mem[1FD] = Y = 0003
+    // --- Test 2: POP results stored in memory ---
+    $display("\n[TEST] Verificare POP (rezultate stocate in memorie):\n");
+    check_mem(9'h040, 16'h000A);  // STR X, #40 -> Mem[40] = X = 0x000A (dupa POP X)
+    check_mem(9'h041, 16'h0014);  // STR Y, #41 -> Mem[41] = Y = 0x0014 (dupa POP Y)
+    check_mem(9'h042, 16'h001E);  // STA #42 -> Mem[42] = AC = 0x001E (dupa POP AC)
 
-    // Verifică memoria (rezultate STR/STA - validare POP)
-    $display("\n[TEST] Verificare memorie (rezultate STR/STA dupa POP):\n");
-    check_mem(9'h036, 16'h0002);  // STR X, #36 -> Mem[36] = X = 0002 (dupa POP X)
-    check_mem(9'h037, 16'h0003);  // STR Y, #37 -> Mem[37] = Y = 0003 (dupa POP Y)
-    check_mem(9'h038, 16'h1234);  // STA #38 -> Mem[38] = AC = 1234 (dupa POP AC)
+    // --- Test 3: JMP/RET - subroutine results ---
+    $display("\n[TEST] Verificare JMP/RET (rezultate subroutine):\n");
+    check_mem(9'h043, 16'h0055);  // STR X, #43 -> X = 0x0055 (setat in subroutine)
+    check_mem(9'h044, 16'h00AA);  // STR Y, #44 -> Y = 0x00AA (setat in subroutine)
 
-    // Date originale (nu trebuie modificate)
-    $display("\n[TEST] Verificare memorie (date originale - neschimbate):\n");
-    check_mem(9'h030, 16'h0002);  // Date originale - valoare initiala X
-    check_mem(9'h031, 16'h0003);  // Date originale - valoare initiala Y
-    check_mem(9'h032, 16'h1234);  // Date originale - valoare initiala AC
+    // --- Test 4: BRA - branch always ---
+    $display("\n[TEST] Verificare BRA (branch always):\n");
+    check_mem(9'h045, 16'h001E);  // STA #45 -> Mem[45] = AC (BRA a sarit peste 0x13, 0x14)
 
-    // Verificare INP - valorile asteptate: 100 (0x0064) si 200 (0x00C8)
-    // Testul ruleaza cu: echo -e "100\n200" | vvp lic
-    $display("\n[TEST] Verificare INP (valori introduse: 100, 200):\n");
-    check_mem(9'h039, 16'h0064);  // INP AC -> STA #39 -> Mem[39] = 100 = 0x0064
-    check_mem(9'h03A, 16'h00C8);  // INP X -> STR X, #3A -> Mem[3A] = 200 = 0x00C8
+    // --- Test 5: BNE - branch not equal (Z=0, should be taken) ---
+    $display("\n[TEST] Verificare BNE (branch if Z=0 - TAKEN):\n");
+    check_mem(9'h046, 16'h001E);  // STA #46 -> Mem[46] = AC (BNE a sarit peste 0x17, 0x18)
 
-    // Verificare OUT - verificam ca programul a ajuns la HLT (PC = 0x0016 dupa HLT)
-    // OUT nu poate fi verificat automat (afiseaza pe consola), dar daca ajunge la HLT, OUT a rulat
-    $display("\n[TEST] Verificare OUT (implicit - programul a ajuns la HLT):\n");
-    check("PC dupa HLT     ", PC, 16'h0016);  // HLT la adresa 0x15, PC incrementat la 0x16
+    // --- Test 6: BEQ - branch equal (Z=1, should NOT be taken since Z=0) ---
+    $display("\n[TEST] Verificare BEQ (branch if Z=1 - NOT TAKEN):\n");
+    check_mem(9'h047, 16'h001E);  // STA #47 -> Mem[47] = AC (BEQ NU a fost luat)
+
+    // --- Test 7: Verify X and Y don't have "bad" values (branches worked) ---
+    $display("\n[TEST] Verificare ca branch-urile au sarit instructiunile corecte:\n");
+    check("X != 0xDEAD     ", (X != 16'hDEAD) ? 16'h0001 : 16'h0000, 16'h0001);
+    check("Y != 0xBEEF     ", (Y != 16'hBEEF) ? 16'h0001 : 16'h0000, 16'h0001);
+
+    // --- Test 8: Date originale neschimbate ---
+    $display("\n[TEST] Verificare date originale (neschimbate):\n");
+    check_mem(9'h030, 16'h000A);  // valoare initiala X = 10
+    check_mem(9'h031, 16'h0014);  // valoare initiala Y = 20
+    check_mem(9'h032, 16'h001E);  // valoare initiala AC = 30
+
+    // --- Test 9: PC after HLT ---
+    $display("\n[TEST] Verificare PC dupa HLT:\n");
+    check("PC dupa HLT     ", PC, 16'h001D);  // HLT la 0x1C, PC incrementat la 0x1D
 
     // ========================================
     // Sumar
