@@ -8,12 +8,12 @@ module Control_Unit_CPU(
   input         out_ack,  
   input         ack_alu,    // finish from ALU
   output        finish,     
-  output [28:0] c           // control signals for proccesor
+  output [57:0] c           // control signals for proccesor
 );
   
   // Implementare OneHot
 
-  wire [45:0] qout;
+  wire [78:0] qout;
  
   // 1. HLT
   ffd_OneHot #(.reset_val(1'b1)) S0 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -50,7 +50,11 @@ module Control_Unit_CPU(
     )) |
     qout[37] |
     qout[42] |
-    qout[45]
+    qout[45] |
+    qout[70] |
+    qout[74] |
+    qout[76] |
+    qout[77] 
   ), .q(qout[2]));
 
   ffd_OneHot S3   (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -265,6 +269,227 @@ module Control_Unit_CPU(
   ffd_OneHot S45  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
     qout[44]
   ), .q(qout[45]));
+
+  // 21. ADD Reg/Imm, Acc = Acc + Reg/Imm
+  ffd_OneHot S46  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & ~op[3] & op[2] & ~op[1] & ~op[0]) // 010100
+  ), .q(qout[46]));
+  
+  // 22. SUB Reg/Imm, Acc = Acc - Reg/Imm
+  ffd_OneHot S47  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & ~op[3] & op[2] & ~op[1] & op[0]) // 010101
+  ), .q(qout[47]));
+  
+  // 23. MUL Reg/Imm, Acc = Acc * Reg/Imm
+  ffd_OneHot S48  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & ~op[3] & op[2] & op[1] & ~op[0]) // 010110
+  ), .q(qout[48]));
+  
+  // 24. DIV Reg/Imm, Acc = Acc / Reg/Imm
+  ffd_OneHot S49  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & ~op[3] & op[2] & op[1] & op[0]) // 010111
+  ), .q(qout[49]));
+  
+  // 25. MOD Reg/Imm, Acc = Acc % Reg/Imm
+  ffd_OneHot S50  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & op[3] & ~op[2] & ~op[1] & ~op[0]) // 011000
+  ), .q(qout[50]));
+  
+  // 26. AND Reg/Imm, Acc = Acc & Reg/Imm
+  ffd_OneHot S51  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & op[3] & ~op[2] & ~op[1] & op[0]) // 011001
+  ), .q(qout[51]));
+  
+  // 27. OR Reg/Imm, Acc = Acc | Reg/Imm
+  ffd_OneHot S52  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & op[3] & ~op[2] & op[1] & ~op[0]) // 011010
+  ), .q(qout[52]));
+  
+  // 28. XOR Reg/Imm, Acc = Acc ^ Reg/Imm
+  ffd_OneHot S53  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & op[3] & ~op[2] & op[1] & op[0]) // 011011
+  ), .q(qout[53]));
+  
+  // 29. NOT Reg/Imm, Acc = ~Reg/Imm
+  ffd_OneHot S54  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (~op[5] & op[4] & op[3] & op[2] & ~op[1] & ~op[0]) // 011100
+  ), .q(qout[54]));
+  
+  ffd_OneHot S78  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (
+      (~op[5] & op[4] & op[3] & op[2] & ~op[1] & op[0]) | // 011101
+      (~op[5] & op[4] & op[3] & op[2] & op[1] & ~op[0]) | // 011110
+      (~op[5] & op[4] & op[3] & op[2] & op[1] & op[0])  | // 011111
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0]) | // 100000
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & op[0]) | // 100001
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & ~op[0]) | // 100010
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & op[0]) | // 100011
+      (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & ~op[0]) | // 100100
+      (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & op[0]) // 100101
+    ) 
+  ), .q(qout[78]));
+
+
+  // 30. ADD #address, Acc = Acc + Mem[address] 
+  ffd_OneHot S55  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (~op[5] & op[4] & op[3] & op[2] & ~op[1] & op[0]) // 011101
+  ), .q(qout[55]));
+  
+  // 31. SUB #address, Acc = Acc - Mem[address] 
+  ffd_OneHot S56  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (~op[5] & op[4] & op[3] & op[2] & op[1] & ~op[0]) // 011110
+  ), .q(qout[56]));
+  
+  // 32. MUL #address, Acc = Acc * Mem[address]
+  ffd_OneHot S57  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (~op[5] & op[4] & op[3] & op[2] & op[1] & op[0]) // 011111
+  ), .q(qout[57]));
+  
+  // 33. DIV #address, Acc = Acc / Mem[address]
+  ffd_OneHot S58  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0]) // 100000
+  ), .q(qout[58]));
+  
+  // 34. MOD #address, Acc = Acc % Mem[address]
+  ffd_OneHot S59  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & op[0]) // 100001
+  ), .q(qout[59]));
+  
+  // 35. AND #address, Acc = Acc & Mem[address]
+  ffd_OneHot S60  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & ~op[0]) // 100010
+  ), .q(qout[60]));
+  
+  // 36. OR #address, Acc = Acc | Mem[address]
+  ffd_OneHot S61  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & op[0]) // 100011
+  ), .q(qout[61]));
+  
+  // 37. XOR #address, Acc = Acc ^ Mem[address]
+  ffd_OneHot S62  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & ~op[0]) // 100100
+  ), .q(qout[62]));
+  
+  // 38. NOT #address, Acc = ~Mem[address]
+  ffd_OneHot S63  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[78] & 
+    (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & op[0]) // 100101
+  ), .q(qout[63]));
+  
+  // 39. LSR #address, Acc = Acc / 2^k(k = imm[3:0])
+  ffd_OneHot S64  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & ~op[3] & op[2] & op[1] & ~op[0]) // 100110
+  ), .q(qout[64]));
+  
+  // 40. LSL #address, Acc = Acc * 2^k(k = imm[3:0])
+  ffd_OneHot S65  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & ~op[3] & op[2] & op[1] & op[0]) // 100111
+  ), .q(qout[65]));
+  
+  // 41. RSR #address, Rotate Acc 1 bit Right
+  ffd_OneHot S66  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & op[3] & ~op[2] & ~op[1] & ~op[0]) // 101000
+  ), .q(qout[66]));
+  
+  // 42. RSR #address, Rotate Acc 1 bit Left
+  ffd_OneHot S67  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & op[3] & ~op[2] & ~op[1] & op[0]) // 101001
+  ), .q(qout[67]));
+  
+  ffd_OneHot S68  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[46] |
+    qout[47] |
+    qout[48] |
+    qout[49] |
+    qout[50] |
+    qout[51] |
+    qout[52] |
+    qout[53] |
+    qout[55] |
+    qout[56] |
+    qout[57] |
+    qout[58] |
+    qout[59] |
+    qout[60] |
+    qout[61] |
+    qout[62] |
+    qout[64] |
+    qout[65] |
+    qout[66] |
+    qout[67] 
+  ), .q(qout[68]));
+  
+  ffd_OneHot S69  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[68] |
+    (qout[69] & ~ack_alu) |
+    qout[54] |
+    qout[63] 
+  ), .q(qout[69]));
+  
+  ffd_OneHot S70  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[69] & ack_alu
+  ), .q(qout[70]));
+  
+  // 43. CMP Reg, Reg,        Reg - Reg and sets the flags
+  ffd_OneHot S71  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & op[3] & ~op[2] & op[1] & ~op[0]) // 101010
+  ), .q(qout[71]));
+  
+  ffd_OneHot S72  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[71] |
+    qout[75]
+  ), .q(qout[72]));
+  
+  ffd_OneHot S73  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[72] |
+    (qout[73] & ~ack_alu)
+  ), .q(qout[73]));
+  
+  ffd_OneHot S74  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[73] & ack_alu
+  ), .q(qout[74]));
+  
+  // 44.  TST Reg, Reg,        Reg & Reg and sets the flags
+  ffd_OneHot S75  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & op[3] & ~op[2] & op[1] & op[0]) // 101011
+  ), .q(qout[75]));
+  
+  // 45. MOV Reg, Reg       Reg[OP1] = Reg[OP2]
+  ffd_OneHot S76  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & op[3] & op[2] & ~op[1] & ~op[0]) // 101100
+  ), .q(qout[76]));
+  
+  // 46. MOV Reg, #imm       Reg[OP1] = imm[5:0]
+  ffd_OneHot S77  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (op[5] & ~op[4] & op[3] & op[2] & ~op[1] & op[0]) // 101101
+  ), .q(qout[77]));
+  
   
   assign finish = qout[0];
   assign c[0] = qout[1];
@@ -293,9 +518,38 @@ module Control_Unit_CPU(
   assign c[23] = qout[34];
   assign c[24] = qout[35];
   assign c[25] = qout[37] | qout[42];
-  assign c[26] = qout[38];
+  assign c[26] = qout[46];
   assign c[27] = qout[41];
   assign c[28] = qout[45];
+  assign c[29] = qout[47];
+  assign c[30] = qout[48];
+  assign c[31] = qout[49];
+  assign c[32] = qout[50];
+  assign c[33] = qout[51];
+  assign c[34] = qout[52];
+  assign c[35] = qout[53];
+  assign c[36] = qout[54];
+  assign c[37] = qout[55];
+  assign c[38] = qout[56];
+  assign c[39] = qout[57];
+  assign c[40] = qout[58];
+  assign c[41] = qout[59];
+  assign c[42] = qout[60];
+  assign c[43] = qout[61];
+  assign c[44] = qout[62];
+  assign c[45] = qout[63];
+  assign c[46] = qout[64];
+  assign c[47] = qout[65];
+  assign c[48] = qout[66];
+  assign c[49] = qout[67];
+  assign c[50] = qout[68];
+  assign c[51] = qout[70];
+  assign c[52] = qout[71];
+  assign c[53] = qout[72];
+  assign c[54] = qout[75];
+  assign c[55] = qout[76];
+  assign c[56] = qout[77];
+  assign c[57]  = qout[78];
   // signals to be continued
 
 endmodule
