@@ -85,9 +85,9 @@ module SoC_tb2;
         cnt = cnt + 1;
       end
       if (finish)
-        $display("[WAIT_FINISH] CPU terminat dupa %0d cicluri", cnt);
+        $display("CPU has finished after %0d clock cycles", cnt);
       else
-        $display("[WAIT_FINISH] TIMEOUT dupa %0d cicluri!", cnt);
+        $display("TIMEOUT after %0d clock cycles!", cnt);
     end
   endtask
 
@@ -417,13 +417,13 @@ module SoC_tb2;
     // ========================================
     // START CPU
     // ========================================
-    $display("\n[TEST] Pornire CPU (start=1)...\n");
+    $display("\nCPU has started...\n");
     cpu_start();
 
     // ========================================
     // Execuție - așteaptă HLT
     // ========================================
-    $display("\n[TEST] Executie program - astept HLT...\n");
+    // $display("\n[TEST] Executie program - astept HLT...\n");
     wait_finish(5000);  // max 1000 cicluri pentru toate instructiunile
 
 
