@@ -1,21 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Tue Jan  6 15:31:11 2026
+[*] Sat Jan 17 22:35:25 2026
 [*]
 [dumpfile] "/home/lica/PROCESSOR/SoC/soc_tb2.vcd"
-[dumpfile_mtime] "Tue Jan  6 15:13:36 2026"
-[dumpfile_size] 1279282
+[dumpfile_mtime] "Sat Jan 17 22:30:57 2026"
+[dumpfile_size] 1376198
 [savefile] "/home/lica/PROCESSOR/SoC/wave2.gtkw"
-[timestart] 133577100
+[timestart] 165894300
 [size] 800 905
 [pos] -1 -1
-*-17.100000 133740000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.100000 166119100 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] SoC_tb2.
 [treeopen] SoC_tb2.uut.
-[treeopen] SoC_tb2.uut.cpu.
-[sst_width] 43
+[sst_width] 297
 [signals_width] 150
-[sst_expanded] 0
+[sst_expanded] 1
 [sst_vpaned_height] 168
 @28
 SoC_tb2.clk
@@ -28,30 +27,105 @@ SoC_tb2.MEM_RD
 SoC_tb2.MEM_WR
 SoC_tb2.FLAGS[3:0]
 @24
-SoC_tb2.STATE[78:0]
-SoC_tb2.CTRL[57:0]
 [color] 3
 SoC_tb2.SP[15:0]
 @22
 [color] 3
 SoC_tb2.PC[15:0]
-@23
 [color] 3
 SoC_tb2.AR[15:0]
-@22
 [color] 3
 SoC_tb2.IR[15:0]
-[color] 3
-SoC_tb2.AC[15:0]
-[color] 3
+@800022
+SoC_tb2.STATE[109:0]
+@28
+(0)SoC_tb2.STATE[109:0]
+(1)SoC_tb2.STATE[109:0]
+(2)SoC_tb2.STATE[109:0]
+(3)SoC_tb2.STATE[109:0]
+(4)SoC_tb2.STATE[109:0]
+(5)SoC_tb2.STATE[109:0]
+(6)SoC_tb2.STATE[109:0]
+(7)SoC_tb2.STATE[109:0]
+(8)SoC_tb2.STATE[109:0]
+(9)SoC_tb2.STATE[109:0]
+(10)SoC_tb2.STATE[109:0]
+(11)SoC_tb2.STATE[109:0]
+(12)SoC_tb2.STATE[109:0]
+(13)SoC_tb2.STATE[109:0]
+(14)SoC_tb2.STATE[109:0]
+(15)SoC_tb2.STATE[109:0]
+(16)SoC_tb2.STATE[109:0]
+(17)SoC_tb2.STATE[109:0]
+(18)SoC_tb2.STATE[109:0]
+(19)SoC_tb2.STATE[109:0]
+(20)SoC_tb2.STATE[109:0]
+(21)SoC_tb2.STATE[109:0]
+(22)SoC_tb2.STATE[109:0]
+(23)SoC_tb2.STATE[109:0]
+(24)SoC_tb2.STATE[109:0]
+(25)SoC_tb2.STATE[109:0]
+(26)SoC_tb2.STATE[109:0]
+(27)SoC_tb2.STATE[109:0]
+(28)SoC_tb2.STATE[109:0]
+(29)SoC_tb2.STATE[109:0]
+(30)SoC_tb2.STATE[109:0]
+(106)SoC_tb2.STATE[109:0]
+(107)SoC_tb2.STATE[109:0]
+(108)SoC_tb2.STATE[109:0]
+(109)SoC_tb2.STATE[109:0]
+@1001200
+-group_end
+@800022
+SoC_tb2.CTRL[77:0]
+@28
+(0)SoC_tb2.CTRL[77:0]
+(1)SoC_tb2.CTRL[77:0]
+(2)SoC_tb2.CTRL[77:0]
+(3)SoC_tb2.CTRL[77:0]
+(4)SoC_tb2.CTRL[77:0]
+(5)SoC_tb2.CTRL[77:0]
+(6)SoC_tb2.CTRL[77:0]
+(7)SoC_tb2.CTRL[77:0]
+(8)SoC_tb2.CTRL[77:0]
+(9)SoC_tb2.CTRL[77:0]
+(10)SoC_tb2.CTRL[77:0]
+(11)SoC_tb2.CTRL[77:0]
+(12)SoC_tb2.CTRL[77:0]
+(13)SoC_tb2.CTRL[77:0]
+(14)SoC_tb2.CTRL[77:0]
+(15)SoC_tb2.CTRL[77:0]
+(16)SoC_tb2.CTRL[77:0]
+(17)SoC_tb2.CTRL[77:0]
+(18)SoC_tb2.CTRL[77:0]
+(19)SoC_tb2.CTRL[77:0]
+(74)SoC_tb2.CTRL[77:0]
+(75)SoC_tb2.CTRL[77:0]
+(76)SoC_tb2.CTRL[77:0]
+(77)SoC_tb2.CTRL[77:0]
+@1001200
+-group_end
+@22
 SoC_tb2.X[15:0]
-[color] 3
 SoC_tb2.Y[15:0]
-SoC_tb2.uut.cpu.mem_in[15:0]
-SoC_tb2.uut.cpu.mux2s_out[15:0]
+SoC_tb2.uut.cpu.r2_out[15:0]
+SoC_tb2.uut.cpu.r3_out[15:0]
+SoC_tb2.uut.cpu.r4_out[15:0]
+SoC_tb2.uut.cpu.r5_out[15:0]
+SoC_tb2.uut.cpu.r6_out[15:0]
+SoC_tb2.uut.cpu.r7_out[15:0]
+@28
+SoC_tb2.uut.cpu.alu.start
+@22
+SoC_tb2.uut.cpu.alu.s[3:0]
+SoC_tb2.uut.cpu.alu.selector[3:0]
+SoC_tb2.uut.cpu.alu.inbus[15:0]
+SoC_tb2.uut.cpu.alu.outbus[15:0]
+@29
+SoC_tb2.uut.cpu.finish_alu
 @28
 SoC_tb2.uut.input_unit.inp_req
-@24
+@22
 SoC_tb2.uut.input_unit.inp_data[15:0]
 @28
 SoC_tb2.uut.input_unit.inp_ack
@@ -60,15 +134,5 @@ SoC_tb2.uut.output_unit.out_req
 SoC_tb2.uut.output_unit.out_data[15:0]
 @28
 SoC_tb2.uut.output_unit.out_ack
-@22
-SoC_tb2.uut.cpu.alu.s[3:0]
-SoC_tb2.uut.cpu.alu.selector[3:0]
-@28
-SoC_tb2.uut.cpu.alu.start
-@22
-SoC_tb2.uut.cpu.alu.inbus[15:0]
-SoC_tb2.uut.cpu.alu.outbus[15:0]
-@28
-SoC_tb2.uut.cpu.finish_alu
 [pattern_trace] 1
 [pattern_trace] 0

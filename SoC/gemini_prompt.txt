@@ -1,0 +1,104 @@
+# PROMPT FOR GEMINI: ASIP Design Recommendation
+
+## Context
+I have implemented a 16-bit processor with the following architecture:
+- **Word size**: 16 bits
+- **Memory**: 512 x 16 (9-bit addressing, addresses 0x000-0x1FF)
+- **Registers**: AC (accumulator), X, Y, PC, SP
+- **Control Unit**: One-hot state machine with 79 states (S0-S78) - **FULLY UTILIZED**
+- **Control Signals**: 58 signals (c[57:0])
+- **Opcode Space**: 6-bit opcodes (0-63), currently 46 opcodes used (0x00-0x2D), **18 opcodes available** (0x2E-0x3F)
+
+## Already Implemented Instructions
+- **Memory Operations**: LDR, LDA, STR, STA (with immediate and indexed addressing)
+- **Stack Operations**: PSH, POP
+- **I/O**: IN, OUT (but testbench doesn't support IN)
+- **Branch Operations**: BEQ, BNE, BGT, BLT, BGE, BLE, BRA, JMP, RET
+- **ALU Register Operations**: ADD, SUB, MUL, DIV, MOD, AND, OR, XOR, NOT
+- **ALU Memory Operations**: ADD_M, SUB_M, MUL_M, DIV_M, MOD_M, AND_M, OR_M, XOR_M, NOT_M
+- **Shift/Rotate**: LSR, LSL, RSR, RSL
+- **Compare/Test**: CMP, TST
+- **Move**: MOV (register-to-register, immediate-to-register)
+
+## Current ALU Capabilities
+- 16-bit Ripple Carry Adder (for ADD/SUB via 2's complement)
+- Logical operations (AND, OR, XOR, NOT)
+- Barrel shifter for shift/rotate
+- Multiplication and division (multi-cycle operations)
+- Flag generation (Zero, Negative, Carry, Overflow)
+
+## Critical Constraints
+1. **Time constraint**: Limited time for implementation
+2. **State machine is at capacity**: All 79 states are used. Adding new states requires expanding the one-hot encoding (doable but adds complexity)
+3. **Must be independent**: The ASIP should NOT heavily depend on existing instructions. I want a specialized unit with its own logic.
+4. **18 opcodes available**: Can use opcodes 0x2E through 0x3F
+5. **Educational value**: This is for an academic project, so it should be impressive and demonstrate ASIP concepts
+
+## Your Task
+Please analyze the processor architecture and suggest **2-3 ASIP (Application-Specific Instruction Processor) implementations** that meet these criteria:
+
+### Requirements:
+1. **Independent Hardware**: Should have its own dedicated logic, not just reusing the existing ALU
+2. **Quick to implement**: Can be done in 3-5 days (considering I have limited time)
+3. **Impressive**: Shows clear benefit of ASIP specialization
+4. **Practical**: Has real-world applications in embedded systems or computing
+5. **Fits constraints**:
+   - Uses 4-8 opcodes from available space (0x2E-0x3F)
+   - Either reuses existing states cleverly OR adds minimal new states (5-10 max)
+   - Doesn't require massive memory expansion
+
+### For Each ASIP Option, Provide:
+1. **Name and Purpose**: What is it and what problem does it solve?
+2. **Real-world Applications**: Where is this used in practice?
+3. **Dedicated Hardware Required**: What specific hardware units need to be added?
+4. **New Instructions**: List 4-8 new instructions with opcodes and operations
+5. **State Machine Impact**: How many new states (if any) are needed?
+6. **Implementation Complexity**: Rate as LOW/MEDIUM/HIGH and justify
+7. **Impressive Factor**: Why is this a good ASIP demonstration?
+8. **Sample Program**: A short example showing the ASIP in action
+
+## ASIP Categories to Consider:
+- **Data Integrity**: CRC calculator, checksum engine, parity generator
+- **Security**: Simple cipher (XOR stream, substitution), hash function
+- **Signal Processing**: Simple FIR filter, FFT butterfly, CORDIC
+- **Error Correction**: Hamming code encoder/decoder, Reed-Solomon (simplified)
+- **Data Compression**: RLE (Run-Length Encoding), Huffman tree walker
+- **Random Number Generation**: LFSR-based PRNG, noise generator
+- **Graphics**: Bresenham line drawing, simple rasterizer
+- **Math**: Polynomial evaluator (Horner's method), GCD calculator
+- **Other specialized domains you think would be excellent**
+
+## Important Notes:
+- Avoid suggesting floating-point coprocessor (too complex, needs ~25+ states)
+- Avoid tensor operations (memory too small, too complex)
+- Avoid generic "calculator" that just wraps existing ALU operations
+- Focus on something with **specialized hardware** that shows clear acceleration benefit
+
+## Files You Can Reference (if provided):
+- `Control_Unit_CPU.v`: Control unit state machine implementation
+- `instructions_format.txt`: Current ISA specification
+- `CPU.v`: Top-level CPU with datapath
+- `ALU.v`: Current ALU implementation
+
+## Expected Output Format:
+```
+### ASIP Option 1: [Name]
+**Purpose**: [1-2 sentences]
+**Applications**: [List 2-3 real-world uses]
+**Dedicated Hardware**:
+- [Hardware unit 1 description]
+- [Hardware unit 2 description]
+**New Instructions**:
+1. Opcode 0x2E - [MNEMONIC]: [Operation description]
+2. Opcode 0x2F - [MNEMONIC]: [Operation description]
+...
+**States Needed**: [Number] new states for [purpose]
+**Complexity**: [LOW/MEDIUM/HIGH] - [Justification]
+**Why It's Impressive**: [2-3 sentences]
+**Sample Program**: [Assembly code example]
+
+### ASIP Option 2: ...
+[Same format]
+```
+
+Please provide thoughtful, practical recommendations that balance implementation time with educational value and real-world applicability.

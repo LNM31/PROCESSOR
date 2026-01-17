@@ -95,13 +95,13 @@ module SoC_tb2;
   // Funcții pentru decodare stare (One-Hot)
   // ==========================================
   
-  // Funcție care returnează numărul stării active (0-78) din one-hot
+  // Funcție care returnează numărul stării active (0-103) din one-hot
   function [6:0] get_state_num;
-    input [78:0] qout;
+    input [103:0] qout;
     integer i;
     begin
       get_state_num = 7'd127;  // Default: invalid
-      for (i = 0; i < 79; i = i + 1) begin
+      for (i = 0; i < 104; i = i + 1) begin
         if (qout[i]) get_state_num = i[6:0];
       end
     end
@@ -109,7 +109,7 @@ module SoC_tb2;
 
   // Funcție care returnează numele stării
   function [79:0] decode_state;  // 10 caractere * 8 = 80 biți
-    input [78:0] qout;
+    input [103:0] qout;
     begin
       case (get_state_num(qout))
         7'd0:  decode_state = "S0_IDLE   ";
@@ -191,6 +191,31 @@ module SoC_tb2;
         7'd76: decode_state = "S76_MOV_RR";
         7'd77: decode_state = "S77_MOV_RI";
         7'd78: decode_state = "S78_MEM   ";
+        7'd79: decode_state = "S79       ";
+        7'd80: decode_state = "S80       ";
+        7'd81: decode_state = "S81       ";
+        7'd82: decode_state = "S82       ";
+        7'd83: decode_state = "S83       ";
+        7'd84: decode_state = "S84       ";
+        7'd85: decode_state = "S85       ";
+        7'd86: decode_state = "S86       ";
+        7'd87: decode_state = "S87       ";
+        7'd88: decode_state = "S88       ";
+        7'd89: decode_state = "S89       ";
+        7'd90: decode_state = "S90       ";
+        7'd91: decode_state = "S91       ";
+        7'd92: decode_state = "S92       ";
+        7'd93: decode_state = "S93       ";
+        7'd94: decode_state = "S94       ";
+        7'd95: decode_state = "S95       ";
+        7'd96: decode_state = "S96       ";
+        7'd97: decode_state = "S97       ";
+        7'd98: decode_state = "S98       ";
+        7'd99: decode_state = "S99       ";
+        7'd100: decode_state = "S100      ";
+        7'd101: decode_state = "S101      ";
+        7'd102: decode_state = "S102      ";
+        7'd103: decode_state = "S103      ";
         default: decode_state = "UNKNOWN   ";
       endcase
     end
@@ -277,8 +302,8 @@ module SoC_tb2;
   wire [15:0] ALU_OUT = uut.cpu.outbus_alu;
   
   // Control Unit
-  wire [78:0] STATE = uut.cpu.cu.qout;  // Stările FF (One-Hot) - 79 stări (S0-S78)
-  wire [57:0] CTRL  = uut.cpu.c;        // Semnale de control - 58 semnale
+  wire [109:0] STATE = uut.cpu.cu.qout;  // Stările FF (One-Hot) - 104 stări (S0-S103)
+  wire [77:0] CTRL  = uut.cpu.c;        // Semnale de control - 77 semnale
   
   // Memory
   wire [15:0] MEM_ADDR = uut.address;
@@ -515,5 +540,24 @@ module SoC_tb2;
     #500;
     $finish;
   end
+
+  // Debug - contor global de cicluri
+  // integer global_cycle;
+  // initial global_cycle = 0;
+
+  // always @(posedge clk) begin
+  //   global_cycle = global_cycle + 1;
+
+  //   // Afișează fiecare 500 de cicluri pentru a vedea că simularea merge
+  //   if (global_cycle % 500 == 0)
+  //     $display(">>> Ciclu global: %0d, state=%0d", global_cycle, get_state_num(STATE));
+
+  //   // Debug detaliat pentru ciclurile 1655-1700
+  //   if (global_cycle >= 1655 && global_cycle <= 1700) begin
+  //     $display("[%0d] state=%0d | inp_req=%b out_req=%b",
+  //              global_cycle, get_state_num(STATE),
+  //              uut.inp_req, uut.out_req);
+  //   end
+  // end
 
 endmodule

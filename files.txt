@@ -23,6 +23,12 @@
 /home/lica/PROCESSOR/Processor/Registers/SP.v
 /home/lica/PROCESSOR/Processor/Registers/X.v
 /home/lica/PROCESSOR/Processor/Registers/Y.v
+/home/lica/PROCESSOR/Processor/Registers/R2.v
+/home/lica/PROCESSOR/Processor/Registers/R3.v
+/home/lica/PROCESSOR/Processor/Registers/R4.v
+/home/lica/PROCESSOR/Processor/Registers/R5.v
+/home/lica/PROCESSOR/Processor/Registers/R6.v
+/home/lica/PROCESSOR/Processor/Registers/R7.v
 /home/lica/PROCESSOR/Processor/SignExtendUnit/SignExtendUnit.v
 /home/lica/PROCESSOR/Processor/SignExtendUnit/SEU_Controller.v
 /home/lica/PROCESSOR/SoC/SoC.v

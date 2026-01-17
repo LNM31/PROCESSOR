@@ -8,12 +8,12 @@ module Control_Unit_CPU(
   input         out_ack,  
   input         ack_alu,    // finish from ALU
   output        finish,     
-  output [57:0] c           // control signals for proccesor
+  output [77:0] c           // control signals for proccesor
 );
   
   // Implementare OneHot
 
-  wire [78:0] qout;
+  wire [109:0] qout;
  
   // 1. HLT
   ffd_OneHot #(.reset_val(1'b1)) S0 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -54,7 +54,8 @@ module Control_Unit_CPU(
     qout[70] |
     qout[74] |
     qout[76] |
-    qout[77] 
+    qout[77] |
+    qout[87] & (~(n ^ v))
   ), .q(qout[2]));
 
   ffd_OneHot S3   (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -489,6 +490,169 @@ module Control_Unit_CPU(
     qout[3] & 
     (op[5] & ~op[4] & op[3] & op[2] & ~op[1] & ~op[0]) // 101100
   ), .q(qout[77]));
+
+  ffd_OneHot S79  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[3] & 
+    (
+      (op[5] & ~op[4] & op[3] & op[2] & op[1] & ~op[0]) | // 101110
+      (op[5] & ~op[4] & op[3] & op[2] & op[1] & op[0])  | // 101111
+      (op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0]) // 110000
+    ) 
+  ), .q(qout[79]));  
+
+  ffd_OneHot S80  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[79]
+  ), .q(qout[80]));
+
+  ffd_OneHot S81  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[80]
+  ), .q(qout[81]));
+  
+  ffd_OneHot S82  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[81] |
+    (qout[82] & ~ack_alu) 
+  ), .q(qout[82]));
+  
+  ffd_OneHot S83  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[82] & ack_alu
+  ), .q(qout[83]));
+  
+  ffd_OneHot S84  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[83] | 
+    qout[109]
+  ), .q(qout[84]));
+  
+  ffd_OneHot S85  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[84]
+  ), .q(qout[85]));
+  
+  ffd_OneHot S86  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[85] |
+    (qout[86] & ~ack_alu)
+  ), .q(qout[86]));
+  
+  ffd_OneHot S87  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[86] & ack_alu
+  ), .q(qout[87]));
+  
+  ffd_OneHot S88  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[87] & ~(~(n ^ v))
+  ), .q(qout[88]));
+  
+  ffd_OneHot S89  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[88]
+  ), .q(qout[89]));
+  
+  ffd_OneHot S90  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[89]
+  ), .q(qout[90]));
+  
+  ffd_OneHot S91  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[90]
+  ), .q(qout[91]));
+  
+  ffd_OneHot S92  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[91]
+  ), .q(qout[92]));
+  
+  ffd_OneHot S93  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[92]
+  ), .q(qout[93]));
+  
+  ffd_OneHot S94  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[93] | 
+    (qout[94] & ~ack_alu)
+  ), .q(qout[94]));
+  
+  ffd_OneHot S95  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[94] & ack_alu
+  ), .q(qout[95]));
+  
+  ffd_OneHot S96  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[95]
+  ), .q(qout[96]));
+  
+  ffd_OneHot S97  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[96] | 
+    (qout[97] & ~out_ack)
+  ), .q(qout[97]));
+
+  ffd_OneHot S98  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[97] & out_ack
+  ), .q(qout[98]));
+
+  ffd_OneHot S99  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[98]
+  ), .q(qout[99]));
+
+  ffd_OneHot S100  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[99] |
+    (qout[100] & ~ack_alu)
+  ), .q(qout[100]));
+
+  ffd_OneHot S101  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[100] & ack_alu
+  ), .q(qout[101]));
+
+  ffd_OneHot S102  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[101]
+  ), .q(qout[102]));
+
+  ffd_OneHot S103  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[102]
+  ), .q(qout[103]));
+
+  ffd_OneHot S104  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[103] | 
+    (qout[104] & ~ack_alu)
+  ), .q(qout[104]));
+
+  ffd_OneHot S105  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[104] & ack_alu
+  ), .q(qout[105]));
+
+  ffd_OneHot S106  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[105]
+  ), .q(qout[106]));
+
+  ffd_OneHot S107  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[106]
+  ), .q(qout[107]));
+
+  ffd_OneHot S108  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[107] |
+    (qout[108] & ~ack_alu)
+  ), .q(qout[108]));
+
+  ffd_OneHot S109  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+    qout[108] & ack_alu
+  ), .q(qout[109]));
+  
+  // ffd_OneHot S98  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+  //   qout[97] & out_ack
+  // ), .q(qout[98]));
+  
+  // ffd_OneHot S99  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+  //   qout[98]
+  // ), .q(qout[99]));
+  
+  // ffd_OneHot S100 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+  //   qout[99]
+  // ), .q(qout[100]));
+  
+  // ffd_OneHot S101 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+  //   qout[100]
+  // ), .q(qout[101]));
+  
+  // ffd_OneHot S102 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+  //   qout[101]
+  // ), .q(qout[102]));
+
+  // ffd_OneHot S103 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
+  //   qout[102]
+  // ), .q(qout[103]));
+
+
   
   
   assign finish = qout[0];
@@ -543,13 +707,41 @@ module Control_Unit_CPU(
   assign c[48] = qout[66];
   assign c[49] = qout[67];
   assign c[50] = qout[68];
-  assign c[51] = qout[70];
+  assign c[51] = qout[70] | qout[95];
   assign c[52] = qout[71];
   assign c[53] = qout[72];
   assign c[54] = qout[75];
   assign c[55] = qout[76];
   assign c[56] = qout[77];
   assign c[57]  = qout[78];
+
+  assign c[58]  = qout[79];
+  assign c[59]  = qout[80];
+  assign c[60]  = qout[81];
+  assign c[61]  = qout[83];
+  assign c[62]  = qout[84];
+  assign c[63]  = qout[85];
+  assign c[64]  = qout[88];
+  assign c[65]  = qout[89];
+  assign c[66]  = qout[90];
+  assign c[67]  = qout[91];
+  assign c[68]  = qout[92];
+  assign c[69]  = qout[93];
+  assign c[70]  = qout[98];
+  assign c[71]  = qout[99] | qout[103] | qout[107];
+  assign c[72]  = qout[101];
+  assign c[73]  = qout[102];
+  assign c[74]  = qout[105];
+  assign c[75]  = qout[106];
+  assign c[77]  = qout[109];
+
+  // assign c[70]  = qout[98] | qout[99];
+  // assign c[71]  = qout[99];
+  // assign c[72]  = qout[100] | qout[101];
+  // assign c[73]  = qout[101];
+  // assign c[74]  = qout[102] | qout[103];
+  // assign c[75]  = qout[103];
+  assign c[76]  = qout[96];
   // signals to be continued
 
 endmodule

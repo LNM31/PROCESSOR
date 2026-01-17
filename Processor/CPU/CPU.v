@@ -20,7 +20,7 @@ module CPU(
   wire finish_alu, negative_alu, zero_alu, carry_alu, overflow_alu;
 
   // Control_Unit_CPU wires
-  wire [57:0] c;
+  wire [77:0] c;
   wire finish_cu;
 
   // SignExtendUnit
@@ -28,7 +28,7 @@ module CPU(
   wire [1:0]  seu_controller_out;
 
   // Registers
-  wire [15:0] ac_out, ar_out, ir_out, pc_out, sp_out, x_out, y_out;
+  wire [15:0] ac_out, ar_out, ir_out, pc_out, sp_out, x_out, y_out, r2_out, r3_out, r4_out, r5_out, r6_out, r7_out;
 
   // FLAGS register
   wire [3:0] flags_out;
@@ -49,19 +49,19 @@ module CPU(
   mux_3s #(16) mux_registers_3s(
     .d0(x_out),
     .d1(y_out),
-    .d2({16'b0}), // z, t, ...
-    .d3({16'b0}),
-    .d4({16'b0}),
-    .d5({16'b0}),
-    .d6({16'b0}),
-    .d7({16'b0}),
+    .d2(r2_out), // z, t, ...
+    .d3(r3_out),
+    .d4(r4_out),
+    .d5(r5_out),
+    .d6(r6_out),
+    .d7(r7_out),
     .sel({
       // sel[2] = (ir[2] & ir[1]) | (ir[3] & ~ir[2]) - pentru d4-d7
-      ((c[18] | c[24]) & ((ir_out[2] & ir_out[1]) | (ir_out[3] & ~ir_out[2]))),
+      ((c[18] | c[24]) & ((ir_out[2] & ir_out[1]) | (ir_out[3] & ~ir_out[2]))) | c[62] | c[63] | c[68] | c[69] | c[75],
       // sel[1] = (ir[2] & ~ir[1]) | (ir[3] & ~ir[2]) - pentru d2-d3, d6-d7
-      ((c[18] | c[24]) & ((ir_out[2] & ~ir_out[1]) | (ir_out[3] & ~ir_out[2]))),
+      ((c[18] | c[24]) & ((ir_out[2] & ~ir_out[1]) | (ir_out[3] & ~ir_out[2]))) | c[59] | c[60] | c[63] | c[68] | c[75],
       // sel[0] = ir[0] pentru PUSH/OUT, ir[9] pentru STR
-      ir_out[9] | c[13] | ((c[52] | c[54] | c[55]) & ~ir_out[4] & ~ir_out[3] & ~ir_out[2] & ir_out[1] & ~ir_out[0]) | (c[53] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ir_out[6] & ~ir_out[5]) | ((c[26] | c[29] | c[30] | c[31] | c[32] | c[33] | c[34] | c[35] | c[36]) & ir_out[9]) | ((c[18] | c[24]) & ir_out[0])
+      ir_out[9] | c[13] | | c[60] | c[63] | c[69] | c[73] | c[75] | ((c[52] | c[54] | c[55]) & ~ir_out[4] & ~ir_out[3] & ~ir_out[2] & ir_out[1] & ~ir_out[0]) | (c[53] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ir_out[6] & ~ir_out[5]) | ((c[26] | c[29] | c[30] | c[31] | c[32] | c[33] | c[34] | c[35] | c[36]) & ir_out[9]) | ((c[18] | c[24]) & ir_out[0])
     }),
     .o(mux_registers_out)
   );
@@ -70,14 +70,19 @@ module CPU(
   // x   0001
   // y   0010
 
-  mux_2s #(16) mux_registers_2s(
+  mux_3s #(16) mux_registers_2s(
     .d0(mux_registers_out), // 0001
     .d1(ac_out),
     .d2(seu_out), //10
     .d3(pc_out),
-    .sel({                              
+    .d4({15'b0, 1'b1}),
+    .d5(16'b1),
+    .d6(16'b1),
+    .d7(16'b1),
+    .sel({
+      1'b0 | c[71],                             
       1'b0 | c[8] | c[27] | c[46] | c[47] | c[48] | c[49] | c[56] | ((c[26] | c[29] | c[30] | c[31] | c[32] | c[33] | c[34] | c[35] | c[36]) & ir_out[8]) | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0])), // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
-      1'b0 | c[15] | c[27] | c[50] | ((c[52] | c[54] | c[55]) & ~ir_out[4] & ~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0]) | (c[53] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ~ir_out[6] & ~ir_out[5]) | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1]))  // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
+      1'b0 | c[15] | c[27] | c[50] | c[76] | ((c[52] | c[54] | c[55]) & ~ir_out[4] & ~ir_out[3] & ~ir_out[2] & ~ir_out[1] & ~ir_out[0]) | (c[53] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ~ir_out[6] & ~ir_out[5]) | ((c[18] | c[24]) & (~ir_out[3] & ~ir_out[2] & ~ir_out[1]))  // 1'b0 = ~c[6] | ~c[7] | ~c[12] | ~c[13]
     }),
     .o(mux2s_out)
   );
@@ -113,13 +118,23 @@ module CPU(
       c[48] |
       c[49] |
       c[52] |
-      c[54] 
+      c[54] |
+      c[59] |
+      c[62] |
+      c[68] |
+      c[70] | 
+      c[73] | 
+      c[75]
     ),      
     .s({
-      1'b0 | c[33] | c[34] | c[35] | c[36] | c[42] | c[43] | c[44] | c[45] | c[49] | c[52] | c[54], // ~c[26] | ~c[37]
-      1'b0 | c[32] | c[36] | c[41] | c[45] | c[46] | c[47] | c[48] | c[52] | c[54], // ~c[26] | ~c[37]
-      1'b0 | c[30] | c[31] | c[34] | c[35] | c[39] | c[40] | c[43] | c[44] | c[47] | c[48] | c[54], // ~c[26] | ~c[37]
-      1'b0 | c[29] | c[31] | c[33] | c[35] | c[38] | c[40] | c[42] | c[44] | c[46] | c[48] | c[52]// ~c[26] | ~c[37]
+      1'b0 | c[33] | c[34] | c[35] | c[36] | c[42] | c[43] | c[44] | c[45] | c[49] | c[52] | c[54] | c[62], // ~c[26] | ~c[37]
+      1'b0 | c[32] | c[36] | c[41] | c[45] | c[46] | c[47] | c[48] | c[52] | c[54] | c[62], // ~c[26] | ~c[37]
+
+      1'b0 | c[30] | c[31] | c[34] | c[35] | c[39] | c[40] | c[43] | c[44] | c[47] | c[48] | c[54] | c[59] |
+      (c[68] & ir_out[15] & ir_out[14] & ~ir_out[13] & ~ir_out[12] & ~ir_out[11] & ~ir_out[10]), // ~c[26] | ~c[37]
+
+      1'b0 | c[29] | c[31] | c[33] | c[35] | c[38] | c[40] | c[42] | c[44] | c[46] | c[48] | c[52] | c[62] | 
+      (c[68] & ir_out[15] & ~ir_out[14] & ir_out[13] & ir_out[12] & ir_out[11] & ir_out[10])
     }),  // default adunare
     .inbus((~{16{enable_mem}} & mux2s_out) | ({16{enable_mem}} & mem_in)), // ~c[...] & mux2s_out || c[...] & mem[ar_out]   // input  [15:0]
     .outbus(outbus_alu),      // output [15:0]
@@ -190,14 +205,14 @@ module CPU(
     .d1(sp_out),      // 001: PUSH/POP - adresa stack
     .d2(seu_out),     // 010: Adresare directă
     .d3(outbus_alu),  // 011: Adresare indexată
-    .d4({16'b0}),  
-    .d5({16'b1}),  // nop
+    .d4(x_out),  
+    .d5(y_out),  // nop
     .d6({16'b1}),  // nop
     .d7({16'b1}),  // nop
     .sel({
-      1'b0 | c[0],                         // s[2]
+      1'b0 | c[0] | c[64] | c[66],                         // s[2]
       1'b0 | c[3] | c[9] | c[11] | c[14] | c[57],  // s[1]
-      1'b0 | c[9] | c[14] | c[17] | c[19]  // s[0]
+      1'b0 | c[9] | c[14] | c[17] | c[19] | c[66]  // s[0]
     }),     // sel urile cresc proportional cu numarul de instructiuni
     .o(mux_ar_out)
   );
@@ -205,7 +220,7 @@ module CPU(
   AR ar(
     .clk(clk),
     .rst_b(rst_b),
-    .en(c[0] | c[1] | c[3] | c[9] | c[11] | c[14] | c[17] | c[19] | c[57]),    // input 1 bit
+    .en(c[0] | c[1] | c[3] | c[9] | c[11] | c[14] | c[17] | c[19] | c[57] | c[64] | c[66]),    // input 1 bit
     .in(mux_ar_out),                    // input [15:0]
     .out(ar_out)              // output[15:0]
   );
@@ -258,6 +273,17 @@ module CPU(
     .out(sp_out)             // output[15:0]
   );
 
+  // Increment: qout + 1 folosind RCA
+  // wire [16:0] incremented;
+  // RCA rca_(
+  //     .x({1'b0, (x_out & {16{c[70]}}) | (y_out & {16{c[72]}}) | (r7_out & {16{c[74]}})}),
+  //     .y(17'b0),
+  //     .ci(1'b1),
+  //     .z(incremented),
+  //     .co(),
+  //     .overflow()
+  // );
+
   wire [15:0] mux_x_out;
   mux_3s #(16) mux_x(
     .d0(mux_registers_out), // de la alt mux
@@ -267,11 +293,11 @@ module CPU(
     .d4(ac_out), 
     .d5(inp_data), // 101 
     .d6(mux2s_out), // nop
-    .d7({16'b1}), // nop
+    .d7(outbus_alu), // nop
     .sel({
-      1'b0 | c[23] | c[55],
-      1'b0 | c[0] | c[4] | c[21] | c[55],
-      1'b0 | c[0] | c[23] | c[56]
+      1'b0 | c[23] | c[55] | c[72],
+      1'b0 | c[0] | c[4] | c[21] | c[55] | c[72],
+      1'b0 | c[0] | c[23] | c[56] | c[72]
     }),
     .o(mux_x_out)
   );
@@ -279,7 +305,7 @@ module CPU(
   X x(
     .clk(clk),
     .rst_b(rst_b),
-    .en(c[0] | c[4] | (c[56] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ir_out[6]) | (c[55] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ~ir_out[6] & ir_out[5]) | ((c[21] | c[23]) & ~ir_out[3] & ~ir_out[2] & ir_out[1] & ~ir_out[0])),                   // input 1 bit
+    .en(c[0] | c[4] | c[72] | (c[56] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ir_out[6]) | (c[55] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ~ir_out[6] & ir_out[5]) | ((c[21] | c[23]) & ~ir_out[3] & ~ir_out[2] & ir_out[1] & ~ir_out[0])),                   // input 1 bit
     .in(mux_x_out),                   // input [15:0]
     .out(x_out)              // output[15:0]
   );
@@ -294,11 +320,11 @@ module CPU(
     .d4(ac_out), 
     .d5(inp_data), // 101 
     .d6(mux2s_out), // nop
-    .d7({16'b1}), // nop
+    .d7(outbus_alu), // nop
     .sel({
-      1'b0 | c[23] | c[55],
-      1'b0 | c[0] | c[5] | c[21] | c[55],
-      1'b0 | c[0] | c[23] | c[56]
+      1'b0 | c[23] | c[55] | c[74],
+      1'b0 | c[0] | c[5] | c[21] | c[55] | c[74],
+      1'b0 | c[0] | c[23] | c[56] | c[74]
     }),
     .o(mux_y_out)
   );
@@ -306,15 +332,63 @@ module CPU(
   Y y(
     .clk(clk),
     .rst_b(rst_b),
-    .en(c[0] | c[5] | (c[56] & ~ir_out[9] & ~ir_out[8] & ir_out[7] & ~ir_out[6]) | (c[55] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ir_out[6] & ~ir_out[5]) | ((c[21] | c[23]) & ~ir_out[3] & ~ir_out[2] & ir_out[1] & ir_out[0])),     // input 1 bit
+    .en(c[0] | c[5] | c[74] | (c[56] & ~ir_out[9] & ~ir_out[8] & ir_out[7] & ~ir_out[6]) | (c[55] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ir_out[6] & ~ir_out[5]) | ((c[21] | c[23]) & ~ir_out[3] & ~ir_out[2] & ir_out[1] & ir_out[0])),     // input 1 bit
     .in(mux_y_out),              // input [15:0]
     .out(y_out)             // output[15:0]
   );
 
+  R2 r2(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(c[58]),                 
+    .in({ {r2_out[15:2]}, ir_out[3:2] }),
+    .out(r2_out)             
+  );
+
+  R3 r3(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(c[58]),                 
+    .in({ {r3_out[15:2]}, ir_out[1:0] }),              
+    .out(r3_out)             
+  );
+
+  R4 r4(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(c[58] | c[61]),                 
+    .in(16'b0 | ({16{c[61]}} & outbus_alu)),              
+    .out(r4_out)             
+  );
+
+  R5 r5(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(c[58] | c[65]),                 
+    .in(16'b0 | ({16{c[65]}} & mem_in)),              
+    .out(r5_out)             
+  );
+
+  R6 r6(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(c[58] | c[67]),                 
+    .in(16'b0 | ({16{c[67]}} & mem_in)),              
+    .out(r6_out)             
+  );
+
+  R7 r7(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(c[58] | c[77]),                 
+    .in(16'b0 | ({16{c[77]}} & outbus_alu)),              
+    .out(r7_out)             
+  );
+
   assign out_data = mux2s_out;
-  assign out_req = c[24];
+  assign out_req = c[24] | c[76];
   assign inp_req = c[22];
-  assign read = c[1] | c[3] | c[9] | c[20] | c[57];
+  assign read = c[1] | c[3] | c[9] | c[20] | c[57] | c[64] | c[66];
   assign write = c[12] | c[13] | c[15] | c[18] | c[27];
   assign mem_out = mux2s_out;
   assign address = ar_out;

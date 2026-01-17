@@ -1,0 +1,55 @@
+480A   //            JMP readMatrix     ; call subroutine
+B020   //            MOV AC, #32        ; AC = 32
+9C02   //            LSL AC, #2         ; AC = 32 << 2 = 128
+B420   //            MOV X, AC
+
+5106   //            ADD AC, #6
+//5103   //            ADD AC, #3
+//5109   //            ADD AC, #9
+//5104   //            ADD AC, #4
+
+B440   //            MOV Y, AC
+
+B80B   //            ADDM #128, #134, #2, #3 
+//B807   //            ADDM #128, #131, #1, #3 
+//B80F   //            ADDM #128, #134, #3, #3 
+//B80A   //            ADDM #128, #134, #2, #2 
+
+0000   //            HLT                ; end of program
+0000   //            padding
+0000   //            padding
+2402   // readMatrix INP X  		        ; linii = N
+B401   //            MOV AC, X    	    ; AC = N
+2403   //            INP Y  		        ; coloane = M 
+5A00   //	           MUL Y 		          ; AC = N * M
+5902   //	           MUL 2 		          ; AC = N * M * 2
+B420   //	           MOV X, AC		      ; X = N * M * 2
+B0B2   // handas     MOV Y, #50         ; adress of i(contor)
+B000   //            MOV AC, #0         ; initialize i = 0
+1200   //            STR AC, 0(Y)       ; store the value into memory
+B0B3   //            MOV Y, #51         ; address of the address of the array
+B020   //            MOV AC, #32        ; AC = 32
+9C02   //            LSL AC, #2         ; AC = 32 << 2 = 128
+1200   //            STR AC, 0(Y)       ; store the value into memory
+B0B2   // loop       MOV Y, #50         ; address of i
+0A00   //            LDR AC, 0(Y)       ; load i
+A801   //            CMP AC, X          ; compare i < N
+3C27   //            BGE endloop        ; branch if i == N
+2401   //            INP AC             ; read element
+07F3   //            LDR Y, #51         ; load address of the array
+1200   //            STR AC, 0(Y)       ; store v[i]
+B0B2   //            MOV Y, #50         ; address of i
+0A00   //            LDR AC, 0(Y)       ; load i
+5101   //            ADD AC, #1         ; increment i
+1200   //            STR AC, 0(Y)       ; store i
+B0B3   //            MOV Y, #51         ; address of the address of the array
+0A00   //            LDR AC, 0(Y)       ; load address
+5101   //            ADD AC, #1         ; increment address
+1200   //            STR AC, 0(Y)       ; store address
+4417   //            BRA loop           ; next iteration
+4C00   // endloop    RET   
+0000   //            padding     
+0000   //            padding   
+ 
+
+             
