@@ -20,7 +20,7 @@ module CPU(
   wire finish_alu, negative_alu, zero_alu, carry_alu, overflow_alu;
 
   // Control_Unit_CPU wires
-  wire [77:0] c;
+  wire [122:0] c;
   wire finish_cu;
 
   // SignExtendUnit
@@ -28,7 +28,7 @@ module CPU(
   wire [1:0]  seu_controller_out;
 
   // Registers
-  wire [15:0] ac_out, ar_out, ir_out, pc_out, sp_out, x_out, y_out, r2_out, r3_out, r4_out, r5_out, r6_out, r7_out;
+  wire [15:0] ac_out, ar_out, ir_out, pc_out, sp_out, x_out, y_out, r2_out, r3_out, r4_out, r5_out, r6_out, r7_out, r8_out, r9_out;
 
   // FLAGS register
   wire [3:0] flags_out;
@@ -36,31 +36,27 @@ module CPU(
   // muxes wires
   wire [15:0] mux2s_out, mux_registers_out;
 
-  // sel_2s[1:0] - selector pentru mux_registers_2s
-  // sel_2s[1] = (ir[3] & (ir[2] | ir[1])) | (~ir[3] & ~ir[2] & ~ir[1] & ~ir[0]);
-  // sel_2s[0] = ~ir[3] & ~ir[2] & ~ir[1];
-
-  // // sel_3s[2:0] - selector pentru mux_registers_3s
-  // sel_3s[2] = (ir[2] & ir[1]) | (ir[3] & ~ir[2] & ~ir[1]);
-  // sel_3s[1] = (ir[2] & ~ir[1]) | (ir[3] & ~ir[2] & ~ir[1]);
-  // sel_3s[0] = ir[0];
-
-  // trebuie logica combinationala inputuri: ir_out[3:0], outpuri sel_mux3s[2:0] si sel_mux2s[1:0] (karghnough)
-  mux_3s #(16) mux_registers_3s(
-    .d0(x_out),
-    .d1(y_out),
-    .d2(r2_out), // z, t, ...
-    .d3(r3_out),
-    .d4(r4_out),
-    .d5(r5_out),
-    .d6(r6_out),
-    .d7(r7_out),
+  mux_4s #(16) mux_registers_3s(
+    .d0 (x_out),
+    .d1 (y_out),
+    .d2 (r2_out),
+    .d3 (r3_out),
+    .d4 (r4_out),
+    .d5 (r5_out),
+    .d6 (r6_out),
+    .d7 (r7_out),
+    .d8 (r8_out),
+    .d9 (r9_out),
+    .d10(16'b1),
+    .d11(16'b1),
+    .d12(16'b1),
+    .d13(16'b1),
+    .d14(16'b1),
+    .d15(16'b1),
     .sel({
-      // sel[2] = (ir[2] & ir[1]) | (ir[3] & ~ir[2]) - pentru d4-d7
+      1'b0,
       ((c[18] | c[24]) & ((ir_out[2] & ir_out[1]) | (ir_out[3] & ~ir_out[2]))) | c[62] | c[63] | c[68] | c[69] | c[75],
-      // sel[1] = (ir[2] & ~ir[1]) | (ir[3] & ~ir[2]) - pentru d2-d3, d6-d7
       ((c[18] | c[24]) & ((ir_out[2] & ~ir_out[1]) | (ir_out[3] & ~ir_out[2]))) | c[59] | c[60] | c[63] | c[68] | c[75],
-      // sel[0] = ir[0] pentru PUSH/OUT, ir[9] pentru STR
       ir_out[9] | c[13] | | c[60] | c[63] | c[69] | c[73] | c[75] | ((c[52] | c[54] | c[55]) & ~ir_out[4] & ~ir_out[3] & ~ir_out[2] & ir_out[1] & ~ir_out[0]) | (c[53] & ~ir_out[9] & ~ir_out[8] & ~ir_out[7] & ir_out[6] & ~ir_out[5]) | ((c[26] | c[29] | c[30] | c[31] | c[32] | c[33] | c[34] | c[35] | c[36]) & ir_out[9]) | ((c[18] | c[24]) & ir_out[0])
     }),
     .o(mux_registers_out)
@@ -90,7 +86,7 @@ module CPU(
   wire enable_mem = c[37] | c[38] | c[39] | c[40] | c[41] | c[42] | c[43] | c[44] | c[45];
 
   ALU alu(
-    .clk(clk), // 1001
+    .clk(clk),
     .rst_b(rst_b),
     .start(
       c[6] |
@@ -383,6 +379,22 @@ module CPU(
     .en(c[58] | c[77]),                 
     .in(16'b0 | ({16{c[77]}} & outbus_alu)),              
     .out(r7_out)             
+  );
+  
+  R8 r8(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(),                 
+    .in(),              
+    .out(r8_out)             
+  );
+  
+  R9 r9(
+    .clk(clk),
+    .rst_b(rst_b),
+    .en(),                 
+    .in(),              
+    .out(r9_out)             
   );
 
   assign out_data = mux2s_out;

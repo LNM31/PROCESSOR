@@ -1,6 +1,7 @@
 /home/lica/PROCESSOR/Processor/ALU16/Combinational/RCA/RCA.v
 /home/lica/PROCESSOR/Processor/ALU16/Combinational/muxes/mux_2s.v
 /home/lica/PROCESSOR/Processor/ALU16/Combinational/muxes/mux_3s.v
+/home/lica/PROCESSOR/Processor/ALU16/Combinational/muxes/mux_4s.v
 /home/lica/PROCESSOR/Processor/ALU16/Combinational/comparator/comp4.v
 /home/lica/PROCESSOR/Processor/ALU16/Registers/ffd.v
 /home/lica/PROCESSOR/Processor/ALU16/Registers/A.v
@@ -29,6 +30,8 @@
 /home/lica/PROCESSOR/Processor/Registers/R5.v
 /home/lica/PROCESSOR/Processor/Registers/R6.v
 /home/lica/PROCESSOR/Processor/Registers/R7.v
+/home/lica/PROCESSOR/Processor/Registers/R8.v
+/home/lica/PROCESSOR/Processor/Registers/R9.v
 /home/lica/PROCESSOR/Processor/SignExtendUnit/SignExtendUnit.v
 /home/lica/PROCESSOR/Processor/SignExtendUnit/SEU_Controller.v
 /home/lica/PROCESSOR/SoC/SoC.v
