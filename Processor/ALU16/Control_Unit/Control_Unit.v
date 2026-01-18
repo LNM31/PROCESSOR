@@ -1,149 +1,273 @@
+//`include "ffd.v"
 module Control_Unit(
-  input clk,rst_b,
-  input [1:0]s,
-  input start,q0,q_1,a_8, //q_neg1 e q[-1],begin e start
-  input [2:0]cnt,
-  output reg [10:0]c,
-  output reg finish
+  input clk, rst_b,
+  input [3:0] s,
+  input start, q0, q_1, a_16, cmp_cnt_m4,
+  input [3:0] cnt,
+  output [18:0] c,
+  output finish
 );
-  localparam S0_ST=4'd0;
-  localparam S1_ST=4'd1;
-  localparam S2_ST=4'd2;
-  localparam S3_ST=4'd3;
-  localparam S4_ST=4'd4;
-  localparam S5_ST=4'd5;
-  localparam S6_ST=4'd6;
-  localparam S7_ST=4'd7;
-  localparam S8_ST=4'd8;
-  localparam S9_ST=4'd9;
-  localparam S10_ST=4'd10;
-  localparam S11_ST=4'd11;
-  localparam S12_ST=4'd12;
-  localparam S13_ST=4'd13;
-  localparam S14_ST=4'd14;
 
-  
-  reg[3:0] st,st_next;
-  
-  always@(posedge clk)
-  begin
-    case(st)
-      S0_ST:
-        if(start==1) st_next=S1_ST;
-        else st_next=S0_ST;
-      S1_ST: st_next=S2_ST;
-      S2_ST:
-        if(s[1]==0) st_next=S3_ST;
-        else if(s==2'b10) st_next=S9_ST;
-        else if(s==2'b11) st_next=S11_ST;
-      S3_ST:
-        if(s==2'b00) st_next=S4_ST;
-        else if(s==2'b01) st_next=S5_ST;
-      S4_ST:
-        if(s==2'b00) st_next=S6_ST;
-        else if(s==2'b10) st_next=S7_ST;
-        else if(s==2'b11) st_next=S12_ST;
-      S5_ST:
-        if(s==2'b01) st_next=S6_ST;
-        else if(s==2'b10) st_next=S7_ST;
-        else if(s==2'b11) st_next=S12_ST;
-      S6_ST:
-        if(s[1]==0) st_next=S0_ST;
-        else if(s[1]==1) st_next=S10_ST;
-      S7_ST: 
-        if(cnt==3'b111) st_next=S6_ST;
-        else st_next=S8_ST;
-      S8_ST:
-        if(s==2'b10) st_next=S9_ST;
-        else if(s==2'b11)
-            begin
-                if(a_8==1'b1) st_next=S4_ST;
-                else if(a_8==1'b0) st_next=S5_ST;
-            end
-      S9_ST:
-        if({q0,q_1}==2'b01) st_next=S4_ST;
-        else if({q0,q_1}==2'b10) st_next=S5_ST;
-        else st_next=S7_ST;
-      S10_ST: st_next=S0_ST;
-      S11_ST:
-        if(a_8==1'b1) st_next=S4_ST;
-        else if(a_8==1'b0) st_next=S5_ST;
-      S12_ST:
-        if(cnt==3'b111)
-          begin
-            if(a_8==1'b1) st_next=S14_ST;
-            else if(a_8==1'b0) st_next=S6_ST;
-          end
-        else st_next=S13_ST;
-      S13_ST: st_next=S8_ST;
-      S14_ST: st_next=S6_ST;
-    endcase
-  end
+    wire [4:0] qout;
+    ffd f4(.clk(clk), .rst_b(rst_b), .en(1'b1),
+    .d(
+          ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & ~cmp_cnt_m4             //10
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & ~cmp_cnt_m4              //12
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & ~cmp_cnt_m4            //14
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                           //15
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & ~s[0]                           //16
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & s[0]                            //17
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & ~s[0]                           //18
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & s[1] & ~s[0]                            //20
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & ~cmp_cnt_m4             //48
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & ~cmp_cnt_m4              //50
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & ~cmp_cnt_m4            //52
 
-  initial begin
-    c=11'd0;
-    finish=0;
-  end
-  always@(posedge clk)
-  begin
-    c=11'd0; //toate 0;
-    finish=0;
-    case(st)
-      S0_ST:
-        if(start==1) c=11'd1;//c0
-        else begin c=11'd0; finish=0; end
-      S1_ST: c=11'd2; //c1
-      S2_ST:
-        if(s[1]==0) c=11'd4; //c2
-        else if(s==2'b10) c=11'd0; //c=0
-        else if(s==2'b11) c=11'd512; //c9
-      S3_ST:
-        if(s==2'b00) c=11'd8; //c3
-        else if(s==2'b01) c=11'd24; //c3,c4
-      S4_ST:
-        if(s==2'b00) c=11'd32; //c5
-        else if(s==2'b10) c=11'd64; //c6
-        else if(s==2'b11) c=11'd1024; //c10
-      S5_ST:
-        if(s==2'b01) c=11'd32; //c5
-        else if(s==2'b10) c=11'd64; //c6
-        else if(s==2'b11) c=11'd1024; //c10
-      S6_ST:
-        if(s[1]==0) begin c=11'd0; finish=1; end
-        else if(s[1]==1) c=11'd256; //c8
-      S7_ST: 
-        if(cnt==3'b111) c=11'd32; //c5
-        else c=11'd128; //c7
-      S8_ST:
-        if(s==2'b10) c=11'd0; //c=0
-        else if(s==2'b11)
-            begin
-                if(a_8==1'b1) c=11'd8; //c3
-                else if(a_8==1'b0) c=11'd24; //c3,c4
-            end
-      S9_ST:
-        if({q0,q_1}==2'b01) c=11'd8; //c3
-        else if({q0,q_1}==2'b10) c=11'd24; //c3,c4
-        else c=11'd64; //c6
-      S10_ST: begin c=11'd0; finish=1; end
-      S11_ST:
-        if(a_8==1'b1) c=11'd8; //c3
-        else if(a_8==1'b0) c=11'd24; //c3,c4
-      S12_ST:
-        if(cnt==3'b111)
-          begin
-            if(a_8==1'b1) c=11'd8; //c3
-            else if(a_8==1'b0) c=11'd32; //c5
-          end
-        else c=11'd512; //c9
-      S13_ST: c=11'd128; //c7
-      S14_ST: c=11'd32; //c5
-    endcase
-  end
 
-  always @(posedge clk or negedge rst_b)
-  begin
-    if(!rst_b) st <= S0_ST;
-    else st <= st_next;
-  end
+     ),
+     .q(qout[4]));
+
+    // to be continued
+    ffd f3(.clk(clk), .rst_b(rst_b), .en(1'b1),
+    .d(
+          ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //4 - bun
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //5
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //6
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //7
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //8
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //9
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & cmp_cnt_m4                                      //11
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //13
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //26
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                   //29
+        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //32 - rau
+        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0])                                           //39 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //40 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //45
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //46
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //47
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & cmp_cnt_m4                                      //49
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //51
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]                                      //64
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & ~a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]       //65
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0])                                          //67
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & qout[0]                                                                                  //68
+        | ~qout[4] & qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                    //69                             
+        | ~qout[4] & qout[3] & qout[2] & qout[1] & qout[0]                                                                                   //71
+        | qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & ~qout[0]                                                                                //72
+        | qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & qout[0]                                                                                 //73
+        | qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0]                                                                                 //74
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //81
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                  //82
+     ),
+     .q(qout[3]));
+
+    // to be continued
+    ffd f2(.clk(clk), .rst_b(rst_b), .en(1'b1),
+    .d(
+          ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //8
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & ~s[0]                                                  //16
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & s[0]                                                   //17
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & ~s[0]                                                  //18
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & ~s[0]                                                 //21
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //22
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                    //23
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1] & ~s[0]                                                //24
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //25 -bun
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //26
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //27
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //28 -bun
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                   //29
+        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & qout[0] & cnt[3] & cnt[2] & cnt[1] & cnt[0]                                              //38 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & a_16                                           //41
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & ~a_16                                          //42
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & a_16                                          //43
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & ~a_16                                         //44
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //46
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & ~q0 & q_1                                                                     //53 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & q0 & ~q_1                                                                     //54 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & qout[1] & qout[0] & a_16                                                                           //62
+        | ~qout[4] & qout[3] & ~qout[2] & qout[1] & qout[0] & ~a_16                                                                          //63
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]                                      //64
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & ~a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]      //66
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0])                                          //67
+        | ~qout[4] & qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                   //70
+        | qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                                                    //75
+        | qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0]                                                                                 //77
+        | qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0]                                                                                  //78
+        | qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0]                                                                                  //79
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & (q0~^q_1)                                                                     //80 -bun
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //81
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                  //82          
+    ),
+    .q(qout[2]));
+
+    // to be continued
+    ffd f1(.clk(clk), .rst_b(rst_b), .en(1'b1),
+    .d(
+          ~qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & qout[0]                                                                                //2
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1]                                                        //3
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //5
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //6
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //7
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //8
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //9
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & cmp_cnt_m4                                      //11
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //13
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & ~cmp_cnt_m4                                   //14
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                                                  //15
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & ~s[0]                                                  //18
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                   //19
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & s[1] & ~s[0]                                                   //20
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1] & ~s[0]                                                //24
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //25 - bun
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //27
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //28 - bun
+        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //32 - rau
+        | ~qout[4] & ~qout[3] & qout[2] & qout[1] & qout[0] & cnt[3] & cnt[2] & cnt[1] & cnt[0]                                              //38 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //45
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //46
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //47
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & cmp_cnt_m4                                      //49
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //51
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & ~cmp_cnt_m4                                   //52
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]                                      //64
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & ~a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]       //65
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & ~a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]      //66
+        | ~qout[4] & qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                    //69
+        | ~qout[4] & qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                   //70
+        | qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                                                    //75
+        | qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0]                                                                                 //77
+        | qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0]                                                                                  //78
+        | qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0]                                                                                  //79
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & (q0~^q_1)                                                                     //80 - bun
+
+
+
+        
+    ),
+    .q(qout[1]));
+
+    // to be continued
+    ffd f0(.clk(clk), .rst_b(rst_b), .en(1'b1),
+    .d(
+          ~qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & start                                                                       //1
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1]                                                        //3
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //4
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //5
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //6
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //8
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & ~cmp_cnt_m4                                     //12
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                                                  //15
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & s[0]                                                   //17
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                   //19
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & s[1] & ~s[0]                                                   //20
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //22
+        | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                    //23
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //25 - bun
+        | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //28 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //40 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & ~a_16                                          //42
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & ~a_16                                         //44
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //46
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & ~cmp_cnt_m4                                     //50
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & q0 & ~q_1                                                                     //54 - bun
+        | ~qout[4] & qout[3] & ~qout[2] & qout[1] & qout[0] & ~a_16                                                                          //63
+        | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0])                                          //67
+        | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & (q0~^q_1)                                                                     //80 - bun
+//poate 84
+
+
+
+        
+    ),
+    .q(qout[0]));
+
+    
+    assign c[18]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & ~s[0];                                                 //18
+    assign c[17]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & s[0];                                                  //17
+    assign c[16]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & ~s[0];                                                 //16
+    assign c[15]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                                                  //15
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & s[1] & ~s[0];                                                  //20
+    assign c[14]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & ~cmp_cnt_m4                                   //14
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & ~cmp_cnt_m4;                                  //52
+    assign c[13]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & ~cmp_cnt_m4                                     //12
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & ~cmp_cnt_m4;                                    //50
+    assign c[12]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & ~cmp_cnt_m4                                    //10
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & ~cmp_cnt_m4;                                   //48
+    assign c[11]  =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4                                    //8
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & ~cmp_cnt_m4;                                   //46
+    assign c[10]  =   ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //26
+                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                   //29
+                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //81
+                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0];                                                 //82 
+    assign c[9]   =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                  //5
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                 //6
+                    | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0]);                                         //67
+    assign c[8]   =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //7
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //9
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & cmp_cnt_m4                                      //11
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //13
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //32- rau
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0] & cmp_cnt_m4                                     //45
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0] & cmp_cnt_m4                                     //47
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0] & cmp_cnt_m4                                      //49
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0] & cmp_cnt_m4                                    //51
+                    | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & ~a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]       //65
+                    | ~qout[4] & qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0];                                                   //69
+    assign c[7]   =   ~qout[4] & ~qout[3] & qout[2] & qout[1] & qout[0] & ~(cnt[3] & cnt[2] & cnt[1] & cnt[0])                                           //39 - bun
+                    | ~qout[4] & qout[3] & qout[2] & ~qout[1] & qout[0]                                                                                  //68                          
+                    | ~qout[4] & qout[3] & qout[2] & qout[1] & qout[0]                                                                                   //71
+                    | qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & ~qout[0]                                                                                //72
+                    | qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & qout[0]                                                                                 //73
+                    | qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0];                                                                                //74
+    assign c[6]   =   ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                 //25 - bun
+                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //28 - bun
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & (q0~^q_1);                                                                    //80 - bun
+    assign c[5]   =   ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1] & ~s[0]                                                //24
+                    | ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //27
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & qout[0] & cnt[3] & cnt[2] & cnt[1] & cnt[0]                                              //38 - bun
+                    | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & ~a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0]      //66
+                    | ~qout[4] & qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                   //70
+                    | qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                                                    //75
+                    | qout[4] & ~qout[3] & qout[2] & ~qout[1] & ~qout[0]                                                                                 //77
+                    | qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0]                                                                                  //78
+                    | qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0];                                                                                 //79
+    assign c[4]   =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //22
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                    //23 
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & ~a_16                                          //42
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & ~a_16                                         //44
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & q0 & ~q_1                                                                     //54 - bun
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & qout[0] & ~a_16;                                                                         //63
+    assign c[3]   =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & ~s[0]                                                 //21
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & ~s[3] & ~s[2] & ~s[1] & s[0]                                                  //22
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                    //23
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & a_16                                           //41
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0] & ~a_16                                          //42
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & a_16                                          //43
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0] & ~a_16                                         //44
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & ~q0 & q_1                                                                     //53 - bun
+                    | ~qout[4] & qout[3] & ~qout[2] & ~qout[1] & qout[0] & q0 & ~q_1                                                                     //54 - bun
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & qout[0] & a_16                                                                           //62
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & qout[0] & ~a_16                                                                          //63
+                    | ~qout[4] & qout[3] & qout[2] & ~qout[1] & ~qout[0] & a_16 & cnt[3] & cnt[2] & cnt[1] & cnt[0];                                     //64
+    assign c[2]   =   ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1]                                                        //3
+                    | ~qout[4] & ~qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & s[0];                                                  //19 
+    assign c[1]   =   ~qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & qout[0];                                                                               //2
+    assign c[0]   =   ~qout[4] & ~qout[3] & ~qout[2] & ~qout[1] & ~qout[0] & start;                                                                      //1
+    assign finish =   ~qout[4] & ~qout[3] & qout[2] & ~qout[1] & qout[0] & s[3] & s[2] & ~s[1] & s[0]                                                    //30
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & ~s[1]                                                         //31
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & ~s[0]                                                  //33
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & s[0]                                                   //34
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & ~s[0]                                                   //35
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & s[1] & s[0]                                                    //36
+                    | ~qout[4] & ~qout[3] & qout[2] & qout[1] & ~qout[0] & s[3] & s[2] & ~s[1] & ~s[0]                                                   //37
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & ~s[0]                                                  //55 - bun
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & ~s[2] & s[1] & s[0]                                                   //56
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & ~s[1] & s[0]                                                   //58
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & ~s[0]                                                   //59
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & ~qout[0] & ~s[3] & s[2] & s[1] & s[0]                                                    //60
+                    | ~qout[4] & qout[3] & ~qout[2] & qout[1] & ~qout[0] & s[3] & ~s[2] & ~s[1] & ~s[0]                                                  //61
+                    | qout[4] & ~qout[3] & ~qout[2] & qout[1] & qout[0] & s[3] & s[2] & s[1] & ~s[0];                                                    //76
+    
 endmodule

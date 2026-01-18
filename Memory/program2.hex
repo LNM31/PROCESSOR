@@ -1,0 +1,20 @@
+// Fisier de instructiuni pentru memoria 512x16
+// Format: valori hexazecimale pe 16 biti
+// Fiecare linie = o locatie de memorie (incepand de la adresa 0)
+
+0001
+0002
+0003
+ABCD
+BEEF
+CAFE
+DEAD
+1234
+5678
+9ABC
+DEF0
+FFFF
+0000
+1111
+2222
+3333

@@ -1,18 +1,18 @@
 module CPU(
-  input clk, rst_b,
-  input start,
-  input inp_ack,
-  input [15:0] inp_data,
-  input [15:0] mem_in,
-  input out_ack,
+  input clk, rst_b,           // clock and reset
+  input start,                // start program
+  input inp_ack,              // inp acknowledge from Input Unit
+  input [15:0] inp_data,      // data from Input Unit
+  input [15:0] mem_in,        // data from Memory
+  input out_ack,              // out acknowledge from Output Unit
   
-  output [15:0] out_data,
-  output out_req,
-  output read, write,
-  output [15:0] mem_out,
-  output [15:0] address,
-  output inp_req,
-  output finish
+  output [15:0] out_data,     // data to be displayed to the Output Unit
+  output out_req,             // output request to Output Unit
+  output read, write,         // read or write to Memory
+  output [15:0] mem_out,      // memory channel to be send to Memory
+  output [15:0] address,      // address to memory
+  output inp_req,             // input request to Input Unit
+  output finish               // finish program
 );
 
   // ALU wires

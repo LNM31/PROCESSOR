@@ -1,17 +1,17 @@
 module Control_Unit_CPU(
-  input         clk, rst_b,
-  input  [5:0]  op,         // opcode from IR(Instruction Register)
-  input         ra,         // RA - Register Address from IR
-  input         start,      // start from user
-  input         n, z, carry, v, // flags
-  input         inp_ack,  
-  input         out_ack,  
-  input         ack_alu,    // finish from ALU
-  output        finish,     
-  output [122:0] c           // control signals for proccesor
+  input clk, rst_b,           // clock and reset
+  input [5:0] op,             // opcode from IR(Instruction Register)
+  input ra,                   // RA - Register Address from IR
+  input start,                // start from user
+  input n, z, carry, v,       // flags
+  input inp_ack,              // inp acknowledge from Input Unit
+  input out_ack,              // out acknowledge from Output Unit
+  input ack_alu,              // finish from ALU
+  output finish,              // finish CPU
+  output [122:0] c            // control signals for proccesor
 );
   
-  // Implementare OneHot
+  // Implementation OneHot
 
   wire [173:0] qout;
  
@@ -19,7 +19,6 @@ module Control_Unit_CPU(
   ffd_OneHot #(.reset_val(1'b1)) S0 (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
     (qout[0] & ~start) | // S0 and start = 0
     qout[3] & (~op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0]) // S3 and opcode = 000000
-
   ), .q(qout[0]));
   
   ffd_OneHot S1   (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -27,8 +26,8 @@ module Control_Unit_CPU(
   ), .q(qout[1]));
   
   ffd_OneHot S2   (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
-    qout[1]  | // from S0
-    qout[5]  | // from S5
+    qout[1]  | 
+    qout[5]  | 
     qout[6]  |
     qout[12] |
     qout[14] |
@@ -226,13 +225,13 @@ module Control_Unit_CPU(
   // 12. - 18. BEQ, BNE, BGT, BLT, BGE, BLE, BRA
   ffd_OneHot S37  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
     qout[3] & (
-      (~op[5] & ~op[4] & op[3] & ~op[2] & op[1] & op[0] & (z)) | // 001011 BEQ
-      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & ~op[0] & (~z)) | // 001100 BNE
-      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & op[0] & (~z & ~(n ^ v))) | // 001101 BGT
-      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & ~op[0] & (n ^ v)) | // 001110 BLT
-      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & op[0] & (~(n ^ v))) | // 001111 BGE
-      (~op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0] & (z | (n ^ v))) | // 010000 BLE
-      (~op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & op[0]) // 010001 BRA
+      (~op[5] & ~op[4] & op[3] & ~op[2] & op[1] & op[0] & (z)) |                // 001011 BEQ
+      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & ~op[0] & (~z)) |              // 001100 BNE
+      (~op[5] & ~op[4] & op[3] & op[2] & ~op[1] & op[0] & (~z & ~(n ^ v))) |    // 001101 BGT
+      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & ~op[0] & (n ^ v)) |            // 001110 BLT
+      (~op[5] & ~op[4] & op[3] & op[2] & op[1] & op[0] & (~(n ^ v))) |          // 001111 BGE
+      (~op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0] & (z | (n ^ v))) |    // 010000 BLE
+      (~op[5] & op[4] & ~op[3] & ~op[2] & ~op[1] & op[0])                       // 010001 BRA
     )
   ), .q(qout[37]));
 
@@ -329,18 +328,17 @@ module Control_Unit_CPU(
   ffd_OneHot S78  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
     qout[3] & 
     (
-      (~op[5] & op[4] & op[3] & op[2] & ~op[1] & op[0]) | // 011101
-      (~op[5] & op[4] & op[3] & op[2] & op[1] & ~op[0]) | // 011110
-      (~op[5] & op[4] & op[3] & op[2] & op[1] & op[0])  | // 011111
-      (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0]) | // 100000
-      (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & op[0]) | // 100001
-      (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & ~op[0]) | // 100010
-      (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & op[0]) | // 100011
-      (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & ~op[0]) | // 100100
-      (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & op[0]) // 100101
+      (~op[5] & op[4] & op[3] & op[2] & ~op[1] & op[0]) |       // 011101
+      (~op[5] & op[4] & op[3] & op[2] & op[1] & ~op[0]) |       // 011110
+      (~op[5] & op[4] & op[3] & op[2] & op[1] & op[0])  |       // 011111
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & ~op[0]) |    // 100000
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & ~op[1] & op[0]) |     // 100001
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & ~op[0]) |     // 100010
+      (op[5] & ~op[4] & ~op[3] & ~op[2] & op[1] & op[0]) |      // 100011
+      (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & ~op[0]) |     // 100100
+      (op[5] & ~op[4] & ~op[3] & op[2] & ~op[1] & op[0])        // 100101
     ) 
   ), .q(qout[78]));
-
 
   // 30. ADD #address, Acc = Acc + Mem[address] 
   ffd_OneHot S55  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
@@ -492,6 +490,7 @@ module Control_Unit_CPU(
     (op[5] & ~op[4] & op[3] & op[2] & ~op[1] & ~op[0]) // 101100
   ), .q(qout[77]));
 
+  // ADDM, SUBM, ELMULM
   ffd_OneHot S79  (.clk(clk), .rst_b(rst_b), .en(1'b1), .d(
     qout[3] & 
     (
@@ -908,8 +907,6 @@ module Control_Unit_CPU(
 
 
 
-  
-  
   assign finish  = qout[0];
   assign c[0]    = qout[1];
   assign c[1]    = qout[2];
@@ -989,7 +986,6 @@ module Control_Unit_CPU(
   assign c[75]   = qout[106];
   assign c[76]   = qout[96] | qout[160];
   assign c[77]   = qout[109];
-
   assign c[78]   = qout[110];
   assign c[79]   = qout[111];
   assign c[80]   = qout[112];
@@ -1036,21 +1032,21 @@ module Control_Unit_CPU(
   assign c[121]  = qout[172];
   assign c[122]  = qout[173];
 
-  // DEBUG: Decodifica starea curenta in zecimal (0-173)
+  // Decode current state in zecimal (0-173)
   reg [7:0] state_num;
   integer i;
   always @(*) begin
-    state_num = 8'd255; // default: nicio stare activa
+    state_num = 8'd255; // default: no active state
     for (i = 0; i < 174; i = i + 1) begin
       if (qout[i]) state_num = i[7:0];
     end
   end
 
-  // DEBUG: Decodifica primul semnal activ in zecimal (0-122)
+  // Decode first active signal in zecimal (0-122)
   reg [7:0] signal_num;
   integer j;
   always @(*) begin
-    signal_num = 8'd255; // default: niciun semnal activ
+    signal_num = 8'd255; // default: no active signal
     for (j = 0; j < 123; j = j + 1) begin
       if (c[j]) signal_num = j[7:0];
     end

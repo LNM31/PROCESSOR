@@ -1,16 +1,16 @@
 `timescale 1ns/1ns
 
-// Input Unit - citește valori de la stdin (decimal, 16 biți)
-// Protocol: CU trimite inp_req=1, Input Unit citește și răspunde cu inp_ack=1
+// Input Unit - reads values from stdin (decimal, 16 bits)
+// Protocol: CU sends inp_req=1, Input Unit reads and responds with inp_ack=1
 
 module input_unit #(
     parameter DW = 16
 )(
     input               clk,
     input               rst_b,
-    input               inp_req,    // request de la CU
-    output reg [DW-1:0] inp_data,   // valoarea citită
-    output reg          inp_ack     // acknowledge către CU
+    input               inp_req,    // request from CU
+    output reg [DW-1:0] inp_data,   // value read
+    output reg          inp_ack     // acknowledge to CU
 );
 
     // State machine
@@ -22,7 +22,7 @@ module input_unit #(
     reg [DW-1:0] temp_data;
     integer scan_result;
 
-    // FSM pentru citire
+    // FSM for reading
     always @(posedge clk or negedge rst_b) begin
         if (!rst_b) begin
             state <= IDLE;
@@ -38,11 +38,11 @@ module input_unit #(
                 end
                 
                 READ: begin
-                    // Citește de la stdin (blocking)
+                    // Read from stdin (blocking)
                     $display("INP: ");
                     scan_result = $fscanf(32'h8000_0000, "%d", temp_data);
                     inp_data <= temp_data;
-                    // $display("[INP] Citit: %0d (0x%h)", temp_data, temp_data);
+                    // $display("[INP] Read: %0d (0x%h)", temp_data, temp_data);
                     state <= DONE;
                 end
                 

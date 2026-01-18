@@ -1,16 +1,16 @@
 `timescale 1ns/1ns
 
-// Output Unit - afișează valori în terminal (decimal, 16 biți)
-// Protocol: CU trimite out_req=1 + out_data, Output Unit afișează și răspunde cu out_ack=1
+// Output Unit - displays values in terminal (decimal, 16 bits)
+// Protocol: CU sends out_req=1 + out_data, Output Unit displays and responds with out_ack=1
 
 module output_unit #(
     parameter DW = 16
 )(
     input               clk,
     input               rst_b,
-    input               out_req,    // request de la CU
-    input      [DW-1:0] out_data,   // valoarea de afișat
-    output reg          out_ack     // acknowledge către CU
+    input               out_req,    // request from CU
+    input      [DW-1:0] out_data,   // value to display
+    output reg          out_ack     // acknowledge to CU
 );
 
     // State machine
@@ -21,7 +21,7 @@ module output_unit #(
     reg [1:0] state;
     reg [DW-1:0] data_out;
 
-    // FSM pentru afișare
+    // FSM for displaying
     always @(posedge clk or negedge rst_b) begin
         if (!rst_b) begin
             state <= IDLE;
@@ -38,15 +38,15 @@ module output_unit #(
                 end
                 
                 WRITE: begin
-                    // Afișează în terminal
+                    // Display in terminal
                     $display("OUTPUT_UNIT: %0d", data_out);
                     state <= DONE;
                 end
-                
+
                 DONE: begin
                     out_ack <= 1'b1;
                     if (!out_req) begin
-                        // CU a văzut ack-ul și a dezactivat req
+                        // CU has seen the ack and deactivated req
                         //out_ack <= 1'b0;
                         state <= IDLE;
                     end
